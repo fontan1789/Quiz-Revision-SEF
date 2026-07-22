@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -56,7 +57,7 @@
 <div class="wrap">
   <div class="header">
     <h1>Révise le SEF avec ClaudIA</h1>
-    <p>346 questions, 24 thèmes</p>
+    <p>350 questions, 24 thèmes</p>
   </div>
 
   <div class="card hidden" id="validationBanner" style="border-color:#c14545; background:#fdeeee;">
@@ -137,12 +138,12 @@ const bank = [
 {p:"Nord",v:"NS",h:["K943","A72","AQ85","K4"],a:"1♥ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Malgré l'absence de longue couleur personnelle, le support global dans les couleurs restantes et la force de la main justifient le contre plutôt qu'un passe trop conservateur. L'enchère laisse le partenaire libre de choisir la couleur de fit. C'est une situation typique où le contre décrit mieux la main qu'une intervention ciblée."]},
 
 // ===== COMPETITIVES : CONTRE D'APPEL — AJOUTS (6) =====
-{p:"Est",v:"Personne",h:["AJ72","KQ85","93","AQ4"],a:"1♦ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Une main régulière avec tolérance dans les trois couleurs restantes et une force nettement supérieure au minimum d'entrée en jeu appelle le contre plutôt qu'une intervention ciblée. Le partenaire choisira librement sa meilleure couleur parmi Pique, Cœur ou Trèfle."]},
-{p:"Ouest",v:"NS",h:["KQ85","A943","AJ7","K5"],a:"1♣ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Sans couleur personnelle dominante, cette main régulière et forte décrit mieux sa valeur via le contre d'appel qu'en imposant une seule couleur. La tolérance correcte partout laisse au partenaire toute latitude de réponse."]},
-{p:"Nord",v:"EO",h:["A972","KJ85","KQ4","A8"],a:"1♥ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["La distribution régulière et le support disponible dans les trois couleurs non annoncées justifient le contre plutôt qu'un passe trop prudent compte tenu de la force détenue. Le partenaire pourra répondre librement dans sa meilleure couleur."]},
-{p:"Sud",v:"Tous",h:["KJ94","AQ85","A7","K93"],a:"1♠ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Le singleton à Carreau libère de la place pour soutenir les trois autres couleurs, configuration idéale pour le contre d'appel. Une intervention directe masquerait la richesse réelle de la main."]},
-{p:"Est",v:"Nous",h:["A854","K972","AQ3","K5"],a:"1♦ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Une main régulière avec un support correct partout et une force dépassant largement le minimum justifie le contre plutôt qu'une annonce ciblée qui sous-décrirait la main. Le partenaire dispose de toute liberté pour répondre."]},
-{p:"Ouest",v:"Eux",h:["KQ93","A85","KJ72","A4"],a:"1♣ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Une main forte et régulière avec tolérance correcte dans les trois couleurs restantes correspond au cas d'école du contre d'appel. Le partenaire choisira la couleur la mieux adaptée à sa propre distribution."]},
+{p:"Est",v:"Personne",h:["AJ72","KQ85","93","AQ4"],a:"1♦ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Main idéale de contre d'appel : quatre cartes dans chacune des majeures, une courte à Carreau dans la couleur d'ouverture adverse et une force largement suffisante. Une intervention à 1♥ ou 1♠ masquerait l'autre majeure. Le contre décrit parfaitement la distribution et laisse au partenaire le choix de la meilleure couleur."]},
+{p:"Ouest",v:"NS",h:["KQ85","A943","AJ7","K5"],a:"1♣ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Main classique de contre d'appel : quatre cartes à Pique, quatre cartes à Cœur et une bonne ouverture. Le partenaire pourra choisir librement sa meilleure majeure. Une intervention naturelle dans une seule couleur serait moins descriptive que le contre."]},
+{p:"Nord",v:"EO",h:["A972","KJ85","KQ4","A8"],a:"1♥ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Face à une ouverture de majeure, le critère essentiel est la possession de quatre cartes dans l'autre majeure. C'est le cas ici avec quatre Piques, associés à une belle force d'ouverture. Le contre d'appel est la description la plus précise de la main."]},
+{p:"Sud",v:"Tous",h:["KJ94","AQ85","A7","K93"],a:"1♠ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Le commentaire initial évoquait un singleton à Carreau alors que la main possède en réalité le doubleton A7. Malgré cela, le contre reste correct grâce aux quatre cartes à Cœur, à la force de la main et à la tolérance dans les mineures. Une intervention à 2♥ sous-décrirait la force globale."]},
+{p:"Est",v:"Nous",h:["A854","K972","AQ3","K5"],a:"1♦ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Cette main possède exactement le profil recherché : les deux majeures quatrièmes et une bonne force d'ouverture. Le contre est prioritaire car il permet de retrouver un éventuel fit majeur avec le partenaire."]},
+{p:"Ouest",v:"Eux",h:["KQ93","A85","KJ72","A4"],a:"1♣ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Main régulière forte avec quatre Piques, une force confortable et une bonne tolérance dans les autres couleurs. Le contre d'appel est l'enchère standard puisqu'il permet au partenaire de choisir sa meilleure couleur."]},
 
 // ===== COMPETITIVES : CONTRE D'APPEL — INTERVENTION 1SA PLUTÔT QUE CONTRE (4) — main régulière avec arrêt réel dans la couleur adverse, 15-18 H : l'intervention 1SA décrit mieux la main qu'un contre =====
 {p:"Nord",v:"Personne",h:["KQ85","Q72","AJ94","K8"],a:"1♣ - ?",q:"Que faites-vous avec un arrêt réel à Trèfle et une main régulière de 15 H ?",c:"1SA",cat:"comp",e:["Un arrêt réel dans la couleur adverse combiné à une distribution parfaitement régulière justifie l'intervention directe de 1SA plutôt que le contre, exactement comme pour une ouverture de 1SA (15-18 H, équilibrée, arrêt). Cette annonce décrit immédiatement force et arrêt au partenaire, alors qu'un contre laisserait planer une ambiguïté sur la nature réelle de la main. Le partenaire développera la suite comme après une ouverture normale de 1SA."]},
@@ -576,7 +577,7 @@ const numberedBank = bank.map((q,i) => ({...q, num: i+1}));
 
 // Thèmes dans l'ordre exact d'insertion dans bank (comptes = original + ajouts)
 const themeDefs = [
-  {name:"Contre d'appel", cat:"comp", count:16},
+  {name:"Contre d'appel", cat:"comp", count:20},
   {name:"Contre punitif", cat:"comp", count:9},
   {name:"Barrages", cat:"comp", count:16},
   {name:"Interventions simples", cat:"comp", count:16},
