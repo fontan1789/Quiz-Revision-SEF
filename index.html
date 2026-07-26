@@ -1,8 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root {
     --bg: #f4f7f3; --card: #ffffff; --accent: #2e7d55; --accent-dark: #1f5c3d;
@@ -46,18 +46,31 @@
   .explanation { font-size:0.98rem; line-height:1.85; color:#2a3a30; }
   .final-card { text-align:center; padding:40px 24px; }
   .hidden { display:none; }
+  .cover-mode { margin:0 0 14px 0; }
+  .cover-mode h3 { margin:0 0 2px 0; font-size:0.95rem; color:var(--accent-dark); }
+  .cover-mode p { margin:0; font-size:0.85rem; line-height:1.55; color:var(--text); }
   .theme-btn { display:block; width:100%; text-align:left; background:#fbfdfa; border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:8px; font-size:0.95rem; font-weight:bold; color:var(--text); cursor:pointer; transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease; font-family:inherit; }
   .theme-btn:hover { background:#eaf3ec; transform:translateY(-1px); box-shadow:0 3px 10px rgba(46,125,85,0.15); }
   .theme-btn.comp { border-left:4px solid var(--comp); }
   .theme-btn.other { border-left:4px solid var(--accent); }
   .mode-label { font-size:0.78rem; color:var(--muted); }
+  @media (max-width: 520px) {
+    body { padding:12px; }
+    .card { padding:16px; border-radius:12px; }
+    .hand { padding:12px 14px; font-size:1rem; line-height:1.75; }
+    .auction { padding:10px 12px; font-size:0.9rem; word-break:break-word; }
+    .question { font-size:1.05rem; }
+    .btn-row { flex-wrap:wrap; }
+    button { padding:14px 10px; min-height:44px; }
+    .context-row, .meta-row { flex-wrap:wrap; gap:4px 12px; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="header">
     <h1>Révise le SEF avec ClaudIA</h1>
-    <p>362 questions, 25 thèmes</p>
+    <p>363 questions, 25 thèmes</p>
   </div>
 
   <div class="card hidden" id="validationBanner" style="border-color:#c14545; background:#fdeeee;">
@@ -74,19 +87,53 @@
     <span class="mode-label" id="modeLabel"></span>
   </div>
 
-  <div class="card" id="menuCard">
+  <div class="card" id="coverCard">
+    <div style="text-align:center;">
+      <h2 style="margin:0 0 2px 0; color:var(--gold);">Révise le SEF avec ClaudIA</h2>
+      <div style="font-size:0.8rem; color:var(--muted); margin-bottom:18px;">363 donnes · 25 thèmes · SEF 2024</div>
+    </div>
+
+    <div class="cover-mode">
+      <h3>🎯 Révision guidée</h3>
+      <p>Cinq donnes dans les 20 thèmes du SEF strict. Passé trente réponses, les thèmes où tes scores sont les plus faibles ressortent plus souvent, pour mieux les assimiler.</p>
+    </div>
+    <div class="cover-mode">
+      <h3>📚 Par thème</h3>
+      <p>Cinq donnes dans le thème choisi, sans répétition. Pour travailler une convention.</p>
+    </div>
+    <div class="cover-mode">
+      <h3>🎲 Jouer en situation</h3>
+      <p>Cinq donnes dans toute la banque, annexes hors SEF comprises. Tu ne sais pas ce qui tombe, comme à la table.</p>
+    </div>
+
+    <div style="margin-top:18px; padding-top:14px; border-top:1px dashed var(--line);">
+      <h3 style="margin:0 0 8px 0; font-size:0.9rem; color:var(--gold);">Le score, seulement en révision guidée</h3>
+      <p style="margin:0 0 8px 0; font-size:0.85rem; line-height:1.55;">Un score ne vaut que si l'échantillon reste comparable d'une fois sur l'autre.</p>
+      <p style="margin:0 0 8px 0; font-size:0.85rem; line-height:1.55;">Par thème, c'est toi qui choisis : cinq manches sur ta meilleure convention flatteraient le chiffre sans rien dire de ton niveau.</p>
+      <p style="margin:0 0 8px 0; font-size:0.85rem; line-height:1.55;">En jeu en situation, le tirage mêle des conventions hors SEF que tu ne joues peut-être pas.</p>
+      <p style="margin:0; font-size:0.85rem; line-height:1.55;">Seule la révision guidée offre un réservoir fixe et un tirage que tu ne contrôles pas. Les deux autres modes servent à apprendre, pas à se noter — rien n'y est enregistré.</p>
+    </div>
+
+    <button class="btn-reveal" onclick="startFromCover()" style="margin-top:20px;">Commencer</button>
+  </div>
+
+  <div class="card hidden" id="menuCard">
     <div style="text-align:center;">
       <h2 style="margin-top:0; color:var(--gold);">Choisissez un mode</h2>
     </div>
     <div style="margin:16px 0;">
       <input type="text" id="playerNameInput" placeholder="Votre prénom (optionnel)" onchange="savePlayerName()" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; font-family:inherit; font-size:0.9rem; background:#fbfdfa; color:var(--text); box-sizing:border-box;">
+      <div id="totalScore" style="margin-top:10px; font-size:0.85rem; text-align:center;"></div>
     </div>
     <div style="display:flex; flex-direction:column; gap:12px;">
-      <button class="btn-reveal" onclick="startRandomMode()">🎲 Test aléatoire — 5 questions</button>
-      <button class="btn-next" onclick="showThemeList()">📚 Révision par thème — 5 questions</button>
       <button class="btn-reveal" onclick="startGuidedMode()" style="background:linear-gradient(135deg,#7c5cbf,#5a3d94);">🎯 Révision guidée — points faibles</button>
+      <button class="btn-next" onclick="showThemeList()">📚 Révision par thème — 5 questions</button>
+      <button class="btn-reveal" onclick="startRandomMode()">🎲 Jouer en situation — 5 questions</button>
     </div>
     <div style="margin-top:20px; padding-top:16px; border-top:1px dashed var(--line);">
+      <div style="text-align:right; margin-bottom:10px;">
+        <button type="button" onclick="showCover()" style="flex:none; background:transparent; border:1px solid var(--line); color:var(--muted); font-size:0.72rem; padding:4px 12px; border-radius:20px; min-height:0; cursor:pointer;">À propos des modes</button>
+      </div>
       <h3 style="margin:0 0 8px 0; font-size:0.9rem; color:var(--gold);">Historique des sessions guidées</h3>
       <div id="historyList"></div>
     </div>
@@ -106,6 +153,9 @@
       <span id="vulnLabel">Vulnérabilité : Personne</span>
     </div>
     <div class="hand" id="handBox"></div>
+    <div style="text-align:right; margin:-6px 0 4px 0;">
+      <button type="button" id="notationBtn" onclick="toggleNotation()" title="Basculer la notation des cartes entre français et anglais" style="flex:none; background:transparent; border:1px solid var(--line); color:var(--muted); font-size:0.72rem; font-weight:bold; letter-spacing:1px; padding:4px 12px; border-radius:20px; min-height:0; cursor:pointer;">A R D V</button>
+    </div>
     <div class="auction" id="auctionBox"></div>
     <div class="question" id="questionText"></div>
     <textarea id="userAnswer" placeholder="Notez votre raisonnement ici avant de révéler la réponse (optionnel)..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); if(!document.getElementById('revealRow').classList.contains('hidden')) reveal();}"></textarea>
@@ -153,8 +203,8 @@ const bank = [
 // ===== COMPETITIVES : CONTRE D'APPEL — AJOUTS (6) =====
 {p:"Est",v:"Personne",h:["AJ72","KQ85","93","AQ4"],a:"1♦ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Une main régulière avec tolérance dans les trois couleurs restantes et une force nettement supérieure au minimum d'entrée en jeu appelle le contre plutôt qu'une intervention ciblée. Le partenaire choisira librement sa meilleure couleur parmi Pique, Cœur ou Trèfle."]},
 {p:"Ouest",v:"NS",h:["KQ85","A943","AJ7","K5"],a:"1♣ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Sans couleur personnelle dominante, cette main régulière et forte décrit mieux sa valeur via le contre d'appel qu'en imposant une seule couleur. La tolérance correcte partout laisse au partenaire toute latitude de réponse."]},
-{p:"Nord",v:"EO",h:["A972","KJ85","KQ4","A8"],a:"1♥ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["La distribution régulière et le support disponible dans les trois couleurs non annoncées justifient le contre plutôt qu'un passe trop prudent compte tenu de la force détenue. Le partenaire pourra répondre librement dans sa meilleure couleur."]},
-{p:"Sud",v:"Tous",h:["KJ94","AQ85","A7","K93"],a:"1♠ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Le singleton à Carreau libère de la place pour soutenir les trois autres couleurs, configuration idéale pour le contre d'appel. Une intervention directe masquerait la richesse réelle de la main."]},
+{p:"Nord",v:"EO",h:["A972","KJ85","KQ4","A8"],a:"1♣ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Le doubleton dans la couleur d'ouverture adverse et le support réel dans les trois couleurs restantes, dont les deux majeures quatrièmes, dessinent le contre d'appel type. Avec dix-sept points d'honneur, passer serait beaucoup trop prudent au regard de la force détenue. Le partenaire pourra répondre librement dans sa meilleure couleur, chacune étant soutenue."]},
+{p:"Sud",v:"Tous",h:["KJ94","AQ85","A7","K93"],a:"1♦ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Le doubleton à Carreau associé aux deux majeures quatrièmes dessine le profil type du contre d'appel sur une ouverture mineure : les trois couleurs que le partenaire peut nommer sont toutes soutenues. Avec dix-sept points d'honneur, la main dépasse confortablement le minimum requis pour agir. Une intervention directe dans une seule majeure masquerait l'autre, et avec elle la richesse réelle de la main."]},
 {p:"Est",v:"Nous",h:["A854","K972","AQ3","K5"],a:"1♦ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Une main régulière avec un support correct partout et une force dépassant largement le minimum justifie le contre plutôt qu'une annonce ciblée qui sous-décrirait la main. Le partenaire dispose de toute liberté pour répondre."]},
 {p:"Ouest",v:"Eux",h:["KQ93","A85","KJ72","A4"],a:"1♣ - ?",q:"Que faites-vous ?",c:"Contre",cat:"comp",e:["Une main forte et régulière avec tolérance correcte dans les trois couleurs restantes correspond au cas d'école du contre d'appel. Le partenaire choisira la couleur la mieux adaptée à sa propre distribution."]},
 
@@ -254,10 +304,10 @@ const bank = [
 // ===== OUVERTURE 5 CARTES MAJEURE (10) =====
 {p:"Sud",v:"Personne",h:["AKQ84","643","K7","A92"],a:"?",q:"Que faites-vous en 1re position ?",c:"1♠",cat:"other",e:["La présence d'une majeure de cinq cartes conduit généralement à l'ouverture naturelle dans cette couleur, conformément à la priorité, dans le cadre standard du SEF 2024. Ouvrir une mineure ici sous-décrirait la distribution réelle de la main. Cette ouverture facilite grandement la recherche du meilleur contrat final."]},
 {p:"Nord",v:"NS",h:["K9432","AQ8","K5","J93"],a:"?",q:"Que faites-vous ?",c:"1♠",cat:"other",e:["Dès qu'une majeure atteint cinq cartes, elle prime, dans le cadre standard du SEF, sur toute mineure de longueur égale ou même supérieure en points. Cette règle simplifie considérablement la suite du développement de l'enchère. Le partenaire pourra soutenir directement si un fit existe."]},
-{p:"Est",v:"Tous",h:["A985","J4","AKQ7","K83"],a:"?",q:"Sans majeure de cinq cartes. Que faites-vous ?",c:"1♦",cat:"other",e:["En l'absence de majeure de cinq cartes, l'ouverture se porte sur la mineure la plus longue disponible. La règle SEF 2024 interdit d'ouvrir une majeure à seulement quatre cartes, quelle que soit sa qualité. Cette convention garantit une information fiable sur la longueur exacte des majeures pour la suite de l'enchère."]},
+{p:"Est",v:"Tous",h:["A985","J4","AQ97","K83"],a:"?",q:"Sans majeure de cinq cartes. Que faites-vous ?",c:"1♦",cat:"other",e:["En l'absence de majeure de cinq cartes, l'ouverture se porte sur la mineure la plus longue disponible. La règle SEF 2024 interdit d'ouvrir une majeure à seulement quatre cartes, quelle que soit sa qualité. Cette convention garantit une information fiable sur la longueur exacte des majeures pour la suite de l'enchère."]},
 {p:"Ouest",v:"Personne",h:["KQJ85","A72","94","K83"],a:"?",q:"Que faites-vous ?",c:"1♠",cat:"other",e:["Une majeure de cinq cartes de bonne qualité rend l'ouverture naturelle immédiate et sans ambiguïté. La force de la main renforce encore la légitimité de cette annonce directe. Le partenaire reçoit un message clair sur la couleur maîtresse de la main."]},
 {p:"Sud",v:"Eux",h:["72","AKJ94","Q83","K95"],a:"?",q:"Que faites-vous ?",c:"1♥",cat:"other",e:["La majeure de cinq cartes s'ouvre naturellement, conformément à la priorité, dans le cadre standard du SEF 2024. Le message transmis au partenaire est immédiat et sans détour. Cette structure facilite la recherche rapide d'un éventuel fit."]},
-{p:"Nord",v:"Nous",h:["AQJ7","K854","93","AJ6"],a:"?",q:"Sans majeure de cinq cartes. Que faites-vous ?",c:"1♣",cat:"other",e:["En l'absence d'une majeure atteignant cinq cartes, l'ouverture se fait dans la mineure la plus longue, ici Trèfle à trois cartes contre Carreau à seulement deux. Ouvrir une majeure à quatre cartes serait contraire à la règle fondamentale du système. Cette convention conserve une signification fiable et univoque à toute ouverture ultérieure de majeure."]},
+{p:"Nord",v:"Nous",h:["AQJ7","Q854","93","AJ6"],a:"?",q:"Sans majeure de cinq cartes. Que faites-vous ?",c:"1♣",cat:"other",e:["En l'absence d'une majeure atteignant cinq cartes, l'ouverture se fait dans la mineure la plus longue, ici Trèfle à trois cartes contre Carreau à seulement deux. Ouvrir une majeure à quatre cartes serait contraire à la règle fondamentale du système. Cette convention conserve une signification fiable et univoque à toute ouverture ultérieure de majeure."]},
 {p:"Est",v:"EO",h:["K8532","3","AQJ4","K97"],a:"?",q:"Que faites-vous ?",c:"1♠",cat:"other",e:["La majeure de cinq cartes s'ouvre naturellement, et la distribution avec une courte complémentaire renforce encore la valeur réelle de la main. Cette ouverture reste la description la plus fidèle et la plus efficace de la main. Le partenaire pourra ensuite explorer le fit avec précision."]},
 {p:"Ouest",v:"Tous",h:["94","KQJ85","A72","K83"],a:"?",q:"Que faites-vous ?",c:"1♥",cat:"other",e:["Une majeure de cinq cartes solide s'ouvre directement, sans détour par une mineure intermédiaire. La force de la main confirme la légitimité de cette annonce immédiate. Le message reste clair et précis pour le partenaire."]},
 {p:"Sud",v:"Personne",h:["AK843","72","K95","A83"],a:"?",q:"Que faites-vous ?",c:"1♠",cat:"other",e:["La présence d'une majeure de cinq cartes rend l'ouverture naturelle évidente, conformément à la priorité, dans le cadre standard du système. Aucune ambiguïté ne subsiste sur le choix de la couleur d'ouverture. Cette annonce facilite immédiatement la recherche du meilleur contrat."]},
@@ -266,7 +316,7 @@ const bank = [
 // ===== OUVERTURE 5 CARTES MAJEURE — AJOUTS (7) =====
 {p:"Sud",v:"Personne",h:["AKQ72","K85","94","J83"],a:"?",q:"Que faites-vous ?",c:"1♠",cat:"other",e:["Une majeure de cinq cartes solide s'ouvre naturellement, priorité, dans le cadre standard du SEF 2024, sur toute autre couleur disponible. La force de la main confirme la légitimité de cette annonce directe."]},
 {p:"Nord",v:"NS",h:["K8543","AQ7","K92","84"],a:"?",q:"Que faites-vous ?",c:"1♠",cat:"other",e:["Dès cinq cartes à Pique, l'ouverture naturelle dans cette couleur prime sur toute mineure de longueur équivalente. Le partenaire pourra soutenir directement si un fit existe."]},
-{p:"Est",v:"Tous",h:["A954","J4","AKQ7","K83"],a:"?",q:"Sans majeure de cinq cartes. Que faites-vous ?",c:"1♦",cat:"other",e:["En l'absence de majeure de cinq cartes, l'ouverture se porte sur la mineure la plus longue disponible, ici Carreau à quatre cartes contre Trèfle à trois. La règle SEF 2024 interdit d'ouvrir une majeure à seulement quatre cartes."]},
+{p:"Est",v:"Tous",h:["K954","J4","AKQ7","983"],a:"?",q:"Sans majeure de cinq cartes. Que faites-vous ?",c:"1♦",cat:"other",e:["En l'absence de majeure de cinq cartes, l'ouverture se porte sur la mineure la plus longue disponible, ici Carreau à quatre cartes contre Trèfle à trois. La règle SEF 2024 interdit d'ouvrir une majeure à seulement quatre cartes."]},
 {p:"Ouest",v:"Personne",h:["KQJ72","A94","83","K95"],a:"?",q:"Que faites-vous ?",c:"1♠",cat:"other",e:["Une majeure de cinq cartes de bonne qualité rend l'ouverture naturelle immédiate. Le partenaire reçoit un message clair sur la couleur maîtresse de la main dès la première enchère."]},
 {p:"Sud",v:"Eux",h:["83","AQJ94","K72","K95"],a:"?",q:"Que faites-vous ?",c:"1♥",cat:"other",e:["La majeure de cinq cartes s'ouvre naturellement, conformément à la priorité, dans le cadre standard du SEF 2024. Cette structure facilite immédiatement la recherche d'un éventuel fit."]},
 {p:"Nord",v:"Nous",h:["AQJ72","K854","93","A6"],a:"?",q:"Que faites-vous ?",c:"1♠",cat:"other",e:["La majeure de cinq cartes prime sur toute autre couleur, y compris une seconde majeure de quatre cartes. L'ouverture reste immédiate et sans détour."]},
@@ -315,9 +365,9 @@ const bank = [
 {p:"Est",v:"Tous",h:["KQ92","A943","KJ5","Q7"],a:"?",q:"Que faites-vous ?",c:"1SA",cat:"other",e:["Une main parfaitement régulière avec une force standard justifie l'ouverture 1SA sans détour par une couleur naturelle. Le message transmis reste précis et immédiatement exploitable par le partenaire."]},
 
 // ===== STAYMAN (10) =====
-{p:"Nord",v:"Personne",h:["AQ7","KJ42","Q95","K83"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Le partenaire demande Stayman. Que répondez-vous avec une majeure de quatre cartes ?",c:"2♥",cat:"other",e:["La priorité systématique va en règle générale à Cœur sur Pique dans la réponse Stayman, indépendamment de la longueur exacte détenue à Pique. Cette convention évite toute ambiguïté lorsque l'ouvreur possède les deux majeures en quatre cartes. Le partenaire pourra ensuite explorer Pique séparément si nécessaire."]},
+{p:"Nord",v:"Personne",h:["AQ7","KJ42","Q95","K83"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Le partenaire demande Stayman. Que répondez-vous avec une majeure de quatre cartes ?",c:"2♥",cat:"other",e:["Quatre cœurs face à trois piques seulement : 2♥ annonce la seule majeure réellement quatrième, cas le plus simple de la structure Stayman. Il faut noter que cette même réponse serait donnée avec quatre cartes dans chaque majeure, si bien que 2♥ ne nie jamais Pique du côté de l'ouvreur. Le répondant qui cherche Pique devra donc le dire lui-même au tour suivant plutôt que d'attendre une précision."]},
 {p:"Sud",v:"Tous",h:["K94","A72","KQ85","A43"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Que répondez-vous sans majeure de quatre cartes ?",c:"2♦",cat:"other",e:["L'absence de toute majeure de quatre cartes conduit généralement à la réponse négative systématique, indépendamment de la force ou de la texture des mineures. Cette convention informe précisément le partenaire pour la suite de son développement. Aucune autre réponse ne serait conforme à la structure Stayman."]},
-{p:"Est",v:"EO",h:["A852","K943","QJ","KQ5"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Que répondez-vous avec les deux majeures en quatre cartes ?",c:"2♥",cat:"other",e:["Même en présence des deux majeures à quatre cartes, la réponse Stayman commence en règle générale par Cœur. Le partenaire pourra ensuite chercher Pique via une enchère complémentaire si besoin. Cette hiérarchie fixe évite toute confusion possible dans l'échange d'information."]},
+{p:"Est",v:"EO",h:["A852","K943","QJ","KQ5"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Que répondez-vous avec les deux majeures en quatre cartes ?",c:"2♥",cat:"other",e:["Avec quatre cartes dans chaque majeure, la réponse reste 2♥ en SEF 2024, mais par économie d'espace et non pour lever une ambiguïté : 2♥ promet quatre cœurs sans nier quatre piques. C'est au répondant de trancher — s'il cherchait Pique, il reprendra 2♠ sur 2♥, ce qui montre quatre piques sans quatre cœurs, la force exacte de cette reprise dépendant des accords du camp. L'ouvreur soutiendra alors sa seconde majeure, de sorte que le fit quatre-quatre à Pique n'est pas perdu mais simplement découvert un tour plus tard."]},
 {p:"Ouest",v:"Personne",h:["K943","A72","QJ5","KQ2"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Que répondez-vous avec une seule majeure de quatre cartes ?",c:"2♠",cat:"other",e:["Seule la majeure réellement détenue en quatre cartes doit être annoncée en réponse au Stayman. Cette précision évite toute confusion sur la nature exacte de la distribution de l'ouvreur, Cœur n'étant présent qu'à trois cartes ici. Le partenaire pourra ainsi juger précisément du meilleur contrat final."]},
 {p:"Sud",v:"Tous",h:["Q72","AK94","Q85","KJ4"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Que répondez-vous avec une majeure de quatre cartes ?",c:"2♥",cat:"other",e:["La majeure détenue en quatre cartes doit être annoncée directement et sans détour dans la réponse Stayman. Cette réponse précise reste indispensable pour permettre au partenaire de fixer le meilleur contrat. Aucune ambiguïté ne subsiste ensuite sur la distribution de l'ouvreur."]},
 {p:"Nord",v:"Personne",h:["A943","K72","QJ5","KQ4"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Que répondez-vous avec une seule majeure de quatre cartes ?",c:"2♠",cat:"other",e:["Seule la majeure atteignant réellement quatre cartes doit être annoncée, sans ambiguïté possible ici puisque l'autre majeure ne compte que trois cartes. Cette précision reste essentielle à la structure conventionnelle. Le partenaire pourra alors juger précisément la suite de l'enchère."]},
@@ -327,9 +377,9 @@ const bank = [
 {p:"Nord",v:"Tous",h:["A72","K943","AQJ","Q42"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Que répondez-vous avec une majeure de quatre cartes ?",c:"2♥",cat:"other",e:["La majeure détenue en quatre cartes s'annonce directement et sans ambiguïté, cas standard de la structure Stayman. Cette réponse permet au partenaire de fixer précisément la suite du développement. Aucune autre annonce ne serait conforme à la convention."]},
 
 // ===== STAYMAN — AJOUTS (6) =====
-{p:"Nord",v:"Personne",h:["AQ2","KJ42","Q953","K3"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Majeure de quatre cartes. Que répondez-vous ?",c:"2♥",cat:"other",e:["La priorité systématique va en règle générale à Cœur sur Pique dans la réponse Stayman, indépendamment de la longueur exacte détenue à Pique. Le partenaire pourra ensuite explorer Pique séparément si nécessaire."]},
+{p:"Nord",v:"Personne",h:["AQ2","KJ42","Q953","K3"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Majeure de quatre cartes. Que répondez-vous ?",c:"2♥",cat:"other",e:["Avec quatre cœurs face à trois piques, 2♥ décrit la majeure détenue sans difficulté particulière. La nuance à connaître est que 2♥ resterait la réponse avec quatre piques en plus : l'annonce promet quatre cœurs mais ne dit rien de Pique. Il revient donc au répondant, et non à l'ouvreur, d'explorer Pique au tour suivant s'il y trouve un intérêt."]},
 {p:"Sud",v:"Tous",h:["K94","A73","KQ85","A94"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Sans majeure de quatre cartes. Que répondez-vous ?",c:"2♦",cat:"other",e:["L'absence de toute majeure de quatre cartes conduit généralement à la réponse négative systématique 2♦. Cette convention informe précisément le partenaire pour la suite de son développement."]},
-{p:"Est",v:"EO",h:["A853","K942","QJ","KQ5"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Les deux majeures en quatre cartes. Que répondez-vous ?",c:"2♥",cat:"other",e:["Même en présence des deux majeures à quatre cartes, la réponse Stayman commence en règle générale par Cœur. Le partenaire pourra ensuite chercher Pique via une enchère complémentaire."]},
+{p:"Est",v:"EO",h:["A853","K942","QJ","KQ5"],a:"Vous 1SA - Partenaire 2♣ - ?",q:"Les deux majeures en quatre cartes. Que répondez-vous ?",c:"2♥",cat:"other",e:["La réponse 2♥ s'impose ici aussi avec les deux majeures quatrièmes, en vertu du principe d'économie : annoncer la moins chère préserve l'espace d'exploration. Il faut retenir que 2♥ ne nie pas Pique — le répondant intéressé par cette couleur reprendra 2♠, montrant quatre piques sans quatre cœurs, et l'ouvreur révélera alors son second quatre cartes en soutenant. Répondre 2♠ d'emblée avec les deux majeures relève d'un autre accord, non retenu par le SEF 2024."]},
 {p:"Ouest",v:"Personne",h:["9432","K72","8543","72"],a:"Partenaire 1SA - ?",q:"Le partenaire ouvre 1SA. Vous avez une majeure de quatre cartes totalement dénuée d'honneur et une main très faible. Est-il opportun de demander Stayman ?",c:"Passe",cat:"other",e:["Malgré la présence d'une majeure de quatre cartes, la main est bien trop faible pour justifier la moindre exploration : même en trouvant un fit, la partie basse resterait identique et le risque existe de se retrouver bloqué si le partenaire répond 2♦ (négatif) sans refuge naturel. Le passe reste la décision la plus sûre, laissant l'ouvreur gérer seul un contrat à 1SA déjà confortable compte tenu de sa force annoncée. Poser Stayman ici n'apporterait strictement rien et compliquerait inutilement l'enchère."]},
 {p:"Sud",v:"Tous",h:["K943","872","954","Q72"],a:"Partenaire 1SA - ?",q:"Le partenaire ouvre 1SA. Vous avez une majeure de quatre cartes avec un seul petit honneur et une main faible. Demandez-vous Stayman ?",c:"Passe",cat:"other",e:["Cinq points d'honneur ne suffisent pas à justifier une exploration, même avec une majeure de quatre cartes en main : la force combinée resterait insuffisante pour envisager la manche, et un simple partiel à 1SA reste tout aussi rentable qu'un éventuel 2 de la majeure. Utiliser Stayman ici reviendrait à prendre un risque sans contrepartie réelle. Le passe reste la réponse la plus simple et la plus sûre."]},
 {p:"Nord",v:"Personne",h:["QJ854","K72","A93","84"],a:"Partenaire 1SA - ?",q:"Le partenaire ouvre 1SA. Vous avez cinq cartes à Pique et une main invitante. Stayman est-il le bon outil ici ?",c:"2♥",cat:"other",e:["Stayman (2♣) est réservé à la recherche d'une majeure de quatre cartes chez l'ouvreur ; dès que le répondant possède cinq cartes ou plus dans une majeure, le Texas devient l'outil approprié et plus précis. Ici, cinq cartes à Pique appellent directement le transfert 2♥, qui décrit immédiatement la longueur exacte et laisse l'ouvreur juger d'une éventuelle sur-acceptation. Confondre les deux conventions est une erreur classique : Stayman interroge une longueur de quatre cartes, jamais cinq."]},
@@ -343,7 +393,7 @@ const bank = [
 
 // ===== TEXAS (JACOBY) SUR 1SA — conforme SEF 2024 : transfert au NIVEAU 2 (2♦→♥, 2♥→♠) =====
 {p:"Sud",v:"Personne",h:["AQ6","KJ84","A93","K75"],a:"Vous 1SA - Partenaire 2♦(Texas) - ?",q:"Le partenaire transfère vers Cœur via 2♦. Que répondez-vous ?",c:"2♥",cat:"other",e:["Le Texas SEF 2024 (Jacoby) se joue au niveau 2 : 2♦ demande 2♥, 2♥ demande 2♠. L'acceptation reste systématique et forcée, l'ouvreur annonçant la couleur immédiatement supérieure sans jugement de valeur personnel. Le partenaire garde ainsi le contrôle du développement, pouvant ensuite passer, inviter ou forcer la manche selon sa main."]},
-{p:"Nord",v:"NS",h:["K943","AQ85","K72","94"],a:"Vous 1SA - Partenaire 2♥(Texas) - ?",q:"Transfert vers Pique. Que répondez-vous ?",c:"2♠",cat:"other",e:["Le transfert 2♥ demande, dans le cadre standard du SEF 2024, 2♠ chez l'ouvreur, conformément à la structure Texas (Jacoby). Aucune exploration supplémentaire n'est nécessaire à ce stade : l'acceptation est habituelle. Le partenaire précisera sa force et sa longueur exacte lors de son prochain tour de parole."]},
+{p:"Nord",v:"NS",h:["K93","AJ85","KQ2","Q104"],a:"Vous 1SA - Partenaire 2♥(Texas) - ?",q:"Transfert vers Pique. Que répondez-vous ?",c:"2♠",cat:"other",e:["Le transfert 2♥ demande, dans le cadre standard du SEF 2024, 2♠ chez l'ouvreur, conformément à la structure Texas (Jacoby). Aucune exploration supplémentaire n'est nécessaire à ce stade : l'acceptation est habituelle. Le partenaire précisera sa force et sa longueur exacte lors de son prochain tour de parole."]},
 {p:"Est",v:"Personne",h:["83","Q8642","752","K94"],a:"Vous 1SA(partenaire) - 2♦(vous) - Partenaire 2♥ - ?",q:"Le partenaire accepte le transfert. Que faites-vous avec une main faible ?",c:"Passe",cat:"other",e:["Une main faible sans intérêt de manche, une fois le transfert accepté par l'ouvreur, se contente de passer en 2♥ : c'est le signoff standard du Texas SEF 2024. Toute enchère supplémentaire inviterait à tort une suite que la main ne justifie pas. Le contrat de 2♥ reste confortable compte tenu de la longueur à Cœur déjà annoncée par le transfert."]},
 {p:"Ouest",v:"Tous",h:["K72","AJ842","953","84"],a:"Vous 1SA(partenaire) - 2♦(vous) - Partenaire 2♥ - ?",q:"Vous avez une main invitante avec cinq cœurs équilibrés. Que faites-vous ?",c:"2SA",cat:"other",e:["Après acceptation du transfert, une main invitante avec cinq cartes à Cœur et une distribution équilibrée s'exprime par 2SA, selon les développements SEF 2024 après Texas. Cette enchère laisse l'ouvreur choisir entre passer, accepter 3SA ou revenir à 4♥. Un passage direct sous-exploiterait le potentiel d'invitation de la main."]},
 {p:"Sud",v:"Personne",h:["72","AJ8642","953","84"],a:"Vous 1SA(partenaire) - 2♦(vous) - Partenaire 2♥ - ?",q:"Vous avez une main invitante avec six cœurs. Que faites-vous ?",c:"3♥",cat:"other",e:["Avec une sixième carte à Cœur, l'invitation se fait par répétition de la majeure à 3♥ plutôt que par 2SA, qui suggérerait une distribution équilibrée à cinq cartes. Cette distinction précise la longueur exacte à l'ouvreur avant sa décision finale. L'ouvreur choisira ensuite entre passer ou conclure à 4♥ selon sa propre force."]},
@@ -355,7 +405,7 @@ const bank = [
 
 // ===== TEXAS / JACOBY — AJOUTS (7) =====
 {p:"Sud",v:"Personne",h:["AQ7","KJ84","A93","K65"],a:"Vous 1SA - Partenaire 2♦(Texas) - ?",q:"Transfert vers Cœur. Que répondez-vous ?",c:"2♥",cat:"other",e:["Le Texas SEF 2024 se joue au niveau 2 : 2♦ demande 2♥. L'acceptation reste systématique et forcée, l'ouvreur annonçant la couleur immédiatement supérieure."]},
-{p:"Nord",v:"NS",h:["K942","AQ85","K73","94"],a:"Vous 1SA - Partenaire 2♥(Texas) - ?",q:"Transfert vers Pique. Que répondez-vous ?",c:"2♠",cat:"other",e:["Le transfert 2♥ demande, dans le cadre standard du SEF, 2♠ chez l'ouvreur. L'acceptation reste habituelle, le partenaire gardant le contrôle du développement."]},
+{p:"Nord",v:"NS",h:["Q7","KJ94","AQ63","K85"],a:"Vous 1SA - Partenaire 2♥(Texas) - ?",q:"Transfert vers Pique. Que répondez-vous ?",c:"2♠",cat:"other",e:["Le transfert 2♥ demande, dans le cadre standard du SEF, 2♠ chez l'ouvreur. L'acceptation reste habituelle, le partenaire gardant le contrôle du développement."]},
 {p:"Est",v:"Personne",h:["84","Q8642","753","K94"],a:"Vous 1SA(partenaire) - 2♦(vous) - Partenaire 2♥ - ?",q:"Main faible après acceptation du transfert. Que faites-vous ?",c:"Passe",cat:"other",e:["Une main faible sans intérêt de manche se contente de passer en 2♥, signoff standard du Texas SEF 2024. Le contrat reste confortable compte tenu de la longueur déjà annoncée."]},
 {p:"Ouest",v:"Tous",h:["K73","AJ842","954","84"],a:"Vous 1SA(partenaire) - 2♦(vous) - Partenaire 2♥ - ?",q:"Main invitante avec cinq cœurs équilibrés. Que faites-vous ?",c:"2SA",cat:"other",e:["Après acceptation du transfert, une main invitante avec cinq cartes à Cœur équilibrée s'exprime par 2SA. Cette enchère laisse l'ouvreur choisir entre passer, accepter 3SA ou revenir à 4♥."]},
 {p:"Sud",v:"Personne",h:["73","AJ8642","954","84"],a:"Vous 1SA(partenaire) - 2♦(vous) - Partenaire 2♥ - ?",q:"Main invitante avec six cœurs. Que faites-vous ?",c:"3♥",cat:"other",e:["Avec une sixième carte à Cœur, l'invitation se fait par répétition de la majeure à 3♥ plutôt que par 2SA. Cette distinction précise la longueur exacte à l'ouvreur."]},
@@ -384,7 +434,7 @@ const bank = [
 {p:"Sud",v:"Tous",h:["84","AKJ853","Q94","72"],a:"Vous 2♥ - Partenaire 2SA(OGUST) - ?",q:"En haut de fourchette avec une belle couleur. Que répondez-vous ?",c:"3SA",cat:"other",e:["La combinaison la plus favorable de la grille OGUST, force en haut de fourchette et couleur de qualité, s'exprime par 3SA. Le partenaire pourra alors envisager sereinement la manche, voire une exploration de chelem."]},
 
 // ===== SPLINTERS (10) =====
-{p:"Nord",v:"Personne",h:["A65","KQJ62","A972","8"],a:"Partenaire 1♥ - ?",q:"Fit établi et singleton dans une couleur courte. Que répondez-vous ?",c:"4♣",cat:"other",e:["Le fit déjà établi combiné à une distribution courte réelle dans une couleur correspond exactement au profil du splinter, conforme à la fourchette documentée de 11-15 H. Une chicane dans une mineure se montre au palier de 4, cohérent avec le traitement du splinter à Carreau ailleurs dans ce thème. Un simple soutien à 3♥ ici masquerait la précieuse information distributionnelle apportée par la courte."]},
+{p:"Nord",v:"Personne",h:["A65","KQJ62","A972","8"],a:"Partenaire 1♥ - ?",q:"Fit établi et singleton dans une couleur courte. Que répondez-vous ?",c:"4♣",cat:"other",e:["Le fit déjà établi combiné à une distribution courte réelle dans une couleur correspond exactement au profil du splinter, conforme à la fourchette documentée de 11-15 H. Un singleton dans une mineure se montre au palier de 4, cohérent avec le traitement du splinter à Carreau ailleurs dans ce thème. Un simple soutien à 3♥ ici masquerait la précieuse information distributionnelle apportée par la courte."]},
 {p:"Sud",v:"Tous",h:["K943","AQJ85","7","K94"],a:"Partenaire 1♥ - ?",q:"Fit établi et singleton dans une couleur. Que répondez-vous ?",c:"4♦",cat:"other",e:["Un singleton réel combiné à un fit confirmé justifie le splinter au niveau de 4, montrant une distribution exceptionnelle en plus de la force de base. Cette annonce oriente clairement le partenaire vers une exploration de chelem. Le saut direct à ce niveau reste le message le plus précis possible."]},
 {p:"Est",v:"EO",h:["7","K943","AQJ85","K94"],a:"Partenaire 1♠ - ?",q:"Sans fit établi à la couleur d'ouverture. Que faites-vous avec une couleur personnelle correcte ?",c:"2♦",cat:"other",e:["Sans fit réellement établi à la couleur d'ouverture, le splinter n'est pas approprié malgré la présence d'une courte ailleurs. Le changement de couleur naturel décrit simplement la main sans déclencher une convention spécialisée qui serait ici hors de propos. Cette distinction entre fit établi et simple tolérance reste essentielle pour éviter tout contresens."]},
 {p:"Ouest",v:"Personne",h:["A943","2","KQJ85","K94"],a:"Partenaire 1♠ - ?",q:"Fit établi et singleton dans une couleur. Que répondez-vous ?",c:"3♥",cat:"other",e:["Le fit confirmé et le singleton réel correspondent au profil standard du splinter au niveau de 3. Cette annonce combine description de force et de distribution courte en une seule enchère. Le partenaire dispose ainsi de toute l'information nécessaire pour juger du potentiel de chelem."]},
@@ -396,7 +446,7 @@ const bank = [
 {p:"Nord",v:"Tous",h:["AQ43","K942","7","QJ85"],a:"Partenaire 1♠ - ?",q:"Fit établi et singleton dans une couleur. Que répondez-vous ?",c:"4♦",cat:"other",e:["Le fit établi et la distribution courte réelle justifient le splinter standard, avec douze points d'honneur dans la fourchette documentée de 11-15 H. Cette enchère reste plus efficace qu'une exploration progressive plus lente. Le partenaire pourra directement évaluer le potentiel de chelem de la main combinée."]},
 
 // ===== SPLINTERS — AJOUTS (6) =====
-{p:"Nord",v:"Personne",h:["A64","KQJ62","A972","8"],a:"Partenaire 1♥ - ?",q:"Fit établi et singleton dans une couleur courte. Que répondez-vous ?",c:"4♣",cat:"other",e:["Le fit déjà établi combiné à une distribution courte réelle correspond exactement au profil du splinter, avec quatorze points d'honneur dans la fourchette documentée de 11-15 H. Une chicane dans une mineure se montre au palier de 4, cohérent avec le traitement du splinter à Carreau ailleurs dans ce thème."]},
+{p:"Nord",v:"Personne",h:["A64","KQJ62","A972","8"],a:"Partenaire 1♥ - ?",q:"Fit établi et singleton dans une couleur courte. Que répondez-vous ?",c:"4♣",cat:"other",e:["Le fit déjà établi combiné à une distribution courte réelle correspond exactement au profil du splinter, avec quatorze points d'honneur dans la fourchette documentée de 11-15 H. Un singleton dans une mineure se montre au palier de 4, cohérent avec le traitement du splinter à Carreau ailleurs dans ce thème."]},
 {p:"Sud",v:"Tous",h:["K942","AQJ85","7","K94"],a:"Partenaire 1♥ - ?",q:"Fit établi et singleton. Que répondez-vous ?",c:"4♦",cat:"other",e:["Un singleton réel combiné à un fit confirmé justifie le splinter au niveau de 4, montrant une distribution exceptionnelle en plus de la force de base. Le saut direct reste le message le plus précis."]},
 {p:"Est",v:"Personne",h:["A942","2","KQJ85","K94"],a:"Partenaire 1♠ - ?",q:"Fit établi et singleton dans une couleur. Que répondez-vous ?",c:"3♥",cat:"other",e:["Le fit confirmé et le singleton réel correspondent au profil standard du splinter au niveau de 3. Le partenaire dispose ainsi de toute l'information nécessaire pour juger du potentiel de chelem."]},
 {p:"Ouest",v:"Tous",h:["K95","AQJ85","-","K9432"],a:"Partenaire 1♥ - ?",q:"Chicane et fit établi. Que répondez-vous ?",c:"4♦",cat:"other",e:["Une chicane véritable combinée à un fit établi justifie le splinter au niveau de 4, montrant une main clairement orientée chelem. Cette annonce transmet un message maximal de force et de forme en une seule enchère."]},
@@ -405,21 +455,21 @@ const bank = [
 
 // ===== RKCB 1430 / GERBER (10) — conforme SEF 2024 : 5 as-clés = 4 As + Roi d'atout =====
 {p:"Sud",v:"Personne",h:["AKQ94","AK63","A5","K4"],a:"Vous 2♣ - Partenaire 2♦ - Vous 2♠ - Partenaire 3♠ - ?",q:"Fit confirmé à Pique après ouverture forte. Que faites-vous ?",c:"4SA",cat:"other",e:["Le fit établi et la richesse en as-clés justifient le RKCB 1430 pour dénombrer précisément les as-clés du partenaire (les 4 As plus le Roi de l'atout) avant de fixer le palier final. Sans cette information, le choix entre petit et grand chelem resterait incertain. Cette enchère reste l'outil le plus fiable dans cette situation."]},
-{p:"Nord",v:"NS",h:["AK85","AQ943","K7","A9"],a:"Vous 1SA - Partenaire 3SA - ?",q:"Fit à sans-atout confirmé et main forte. Envisagez-vous le chelem ?",c:"4♣(Gerber)",cat:"other",e:["Sans couleur d'atout établie, le Gerber reste l'outil approprié pour dénombrer les As avant de conclure à sans-atout. Cette convention diffère du RKCB 1430 justement parce qu'aucune couleur n'a été fixée comme atout entre les deux mains, donc aucun Roi d'atout à intégrer au décompte. La réponse du partenaire orientera ensuite le choix final de palier."]},
+{p:"Nord",v:"NS",h:["AQ85","K94","AJ7","K93"],a:"Vous 1SA - Partenaire 3SA - ?",q:"Fit à sans-atout confirmé et main forte. Envisagez-vous le chelem ?",c:"4♣(Gerber)",cat:"other",e:["Sans couleur d'atout établie, le Gerber reste l'outil approprié pour dénombrer les As avant de conclure à sans-atout. Cette convention diffère du RKCB 1430 justement parce qu'aucune couleur n'a été fixée comme atout entre les deux mains, donc aucun Roi d'atout à intégrer au décompte. La réponse du partenaire orientera ensuite le choix final de palier."]},
 {p:"Est",v:"Tous",h:["AKQ85","K943","A5","43"],a:"Vous 1♠ - Partenaire 3♠ - ?",q:"Fit fort à Pique après soutien du partenaire. Que faites-vous ?",c:"4SA",cat:"other",e:["La couleur d'atout étant déjà établie, le RKCB 1430 reste l'outil approprié pour explorer le potentiel de chelem après le soutien fort du partenaire. Cette enchère permet de dénombrer précisément les as-clés (incluant le Roi de Pique) avant la décision finale. Le choix entre 4SA et une conclusion directe dépend de la richesse en as-clés disponible personnellement, ici déjà solide avec l'As et le Roi d'atout."]},
-{p:"Ouest",v:"Personne",h:["A943","AK85","KQ7","43"],a:"Vous 1♥ - Partenaire 4♥ - ?",q:"Soutien barrage du partenaire et richesse personnelle en as-clés. Que faites-vous ?",c:"4SA",cat:"other",e:["Malgré le soutien barrage limitant l'information sur la force précise du partenaire, la richesse personnelle en as-clés (As et Roi de Cœur inclus) justifie une exploration RKCB 1430. Cette enchère permet de vérifier si un chelem reste envisageable malgré l'incertitude sur la force exacte du partenaire. La réponse obtenue guidera la décision finale de palier."]},
+{p:"Ouest",v:"Personne",h:["A94","AK853","KQ7","43"],a:"Vous 1♥ - Partenaire 4♥ - ?",q:"Soutien barrage du partenaire et richesse personnelle en as-clés. Que faites-vous ?",c:"4SA",cat:"other",e:["Malgré le soutien barrage limitant l'information sur la force précise du partenaire, la richesse personnelle en as-clés (As et Roi de Cœur inclus) justifie une exploration RKCB 1430. Cette enchère permet de vérifier si un chelem reste envisageable malgré l'incertitude sur la force exacte du partenaire. La réponse obtenue guidera la décision finale de palier."]},
 {p:"Sud",v:"Tous",h:["AK943","A85","KQ7","43"],a:"Vous 1♠ - Partenaire 2SA(forcing) - Vous 3♠ - Partenaire 4SA - ?",q:"Le partenaire lance le RKCB 1430. Que répondez-vous ?",c:"5♦",cat:"other",e:["La réponse RKCB 1430 SEF 2024 suit l'échelle des as-clés (les 4 As plus le Roi d'atout) : 5♣ pour 1 ou 4 as-clés, 5♦ pour 0 ou 3, 5♥ pour 2 sans la Dame d'atout, 5♠ pour 2 avec la Dame d'atout. Ici, la main détient l'As et le Roi de Pique (l'atout) ainsi que l'As de Cœur, soit trois as-clés au total, d'où la réponse 5♦. Le partenaire pourra ensuite décider du palier final, éventuellement en interrogeant la Dame d'atout via 5SA."]},
 {p:"Nord",v:"Personne",h:["K943","AKQ85","A7","43"],a:"Vous 1♥ - Partenaire 3♥ - ?",q:"Fit fort confirmé et main forte. Que faites-vous ?",c:"4SA",cat:"other",e:["Le fit établi et la richesse en as-clés (As, Roi et Dame de Cœur inclus) suffisent pour justifier un RKCB 1430 explorant sérieusement le potentiel de chelem. Sans cette étape, la décision de palier resterait fondée sur des suppositions plutôt que sur une information précise et fiable. Selon la réponse du partenaire, la décision finale se portera entre 6♥ et une simple manche prudente."]},
 {p:"Est",v:"Tous",h:["AQ85","K943","A72","K4"],a:"Vous 1SA - Partenaire 4SA(invitation chelem) - ?",q:"Invitation directe du partenaire à sans-atout. Que faites-vous avec un jeu maximum ?",c:"6SA",cat:"other",e:["Un jeu maximum dans la fourchette d'ouverture face à une invitation quantitative justifie l'acceptation directe du chelem à sans-atout. Refuser reviendrait à sous-exploiter une main répondant précisément aux critères recherchés par le partenaire pour cette invitation. Cette décision reste habituelle dès que le maximum de fourchette est confirmé, sans besoin d'exploration supplémentaire par RKCB, puisqu'il n'y a pas de couleur d'atout ici."]},
-{p:"Ouest",v:"EO",h:["K943","A85","AKQ7","94"],a:"Vous 1♦ - Partenaire 3♦ - ?",q:"Fit fort à Carreau et richesse en as-clés. Que faites-vous ?",c:"4SA",cat:"other",e:["La couleur d'atout établie et la richesse en as-clés (As et Roi de Carreau inclus) justifient le RKCB 1430 pour affiner la décision finale de palier. Cette enchère permet de vérifier précisément le nombre d'as-clés détenus par le partenaire, plutôt que de s'appuyer sur une simple estimation. Le résultat orientera le choix entre manche, petit ou grand chelem."]},
+{p:"Ouest",v:"EO",h:["K943","A85","AKQ72","9"],a:"Vous 1♦ - Partenaire 3♦ - ?",q:"Fit fort à Carreau et richesse en as-clés. Que faites-vous ?",c:"4SA",cat:"other",e:["La couleur d'atout établie et la richesse en as-clés (As et Roi de Carreau inclus) justifient le RKCB 1430 pour affiner la décision finale de palier. Cette enchère permet de vérifier précisément le nombre d'as-clés détenus par le partenaire, plutôt que de s'appuyer sur une simple estimation. Le résultat orientera le choix entre manche, petit ou grand chelem."]},
 {p:"Sud",v:"Personne",h:["A943","K85","AQ7","K94"],a:"Vous 1SA - Partenaire 4♣(Gerber) - ?",q:"Le partenaire lance Gerber. Que répondez-vous ?",c:"4♠",cat:"other",e:["La réponse Gerber standard suit sa propre échelle, distincte du RKCB 1430 : 4♦ pour zéro ou quatre As, 4♥ pour un As, 4♠ pour deux As, 4SA pour trois As. Confondre les deux échelles serait une erreur conventionnelle grave. Le partenaire pourra ensuite décider du palier final selon cette réponse précise."]},
 {p:"Nord",v:"Tous",h:["AK943","AQ85","K7","94"],a:"Vous 1♠ - Partenaire 4♠(soutien barrage) - ?",q:"Soutien barrage et richesse personnelle en as-clés. Que faites-vous ?",c:"4SA",cat:"other",e:["La richesse personnelle en as-clés (As et Roi de Pique inclus) justifie l'exploration RKCB 1430 malgré le soutien limité en information précise du partenaire. Cette enchère permet de vérifier si le chelem reste réalisable malgré l'incertitude sur la force exacte du partenaire. La réponse obtenue guidera la décision finale de palier plutôt que de s'arrêter par prudence excessive à la simple manche."]},
 
 // ===== RKCB 1430 / GERBER — AJOUTS (7) =====
 {p:"Sud",v:"Personne",h:["AKQ93","AK64","A5","K4"],a:"Vous 2♣ - Partenaire 2♦ - Vous 2♠ - Partenaire 3♠ - ?",q:"Fit confirmé à Pique après ouverture forte. Que faites-vous ?",c:"4SA",cat:"other",e:["Le fit établi et la richesse en as-clés justifient le RKCB 1430 pour dénombrer précisément les as-clés du partenaire avant de fixer le palier final. Sans cette information, le choix entre petit et grand chelem resterait incertain."]},
-{p:"Nord",v:"NS",h:["AK84","AQ943","K7","A9"],a:"Vous 1SA - Partenaire 3SA - ?",q:"Fit à sans-atout confirmé et main forte. Envisagez-vous le chelem ?",c:"4♣(Gerber)",cat:"other",e:["Sans couleur d'atout établie, le Gerber reste l'outil approprié pour dénombrer les As avant de conclure à sans-atout. La réponse du partenaire orientera ensuite le choix final de palier."]},
+{p:"Nord",v:"NS",h:["KJ7","A985","AQ4","K93"],a:"Vous 1SA - Partenaire 3SA - ?",q:"Fit à sans-atout confirmé et main forte. Envisagez-vous le chelem ?",c:"4♣(Gerber)",cat:"other",e:["Sans couleur d'atout établie, le Gerber reste l'outil approprié pour dénombrer les As avant de conclure à sans-atout. La réponse du partenaire orientera ensuite le choix final de palier."]},
 {p:"Est",v:"Tous",h:["AKQ84","K943","A5","K4"],a:"Vous 1♠ - Partenaire 3♠ - ?",q:"Fit fort à Pique après soutien du partenaire. Que faites-vous ?",c:"4SA",cat:"other",e:["La couleur d'atout étant déjà établie, le RKCB 1430 reste l'outil approprié pour explorer le potentiel de chelem. Cette enchère permet de dénombrer précisément les as-clés, incluant le Roi de Pique."]},
-{p:"Ouest",v:"Personne",h:["A9432","AK85","KQ7","4"],a:"Vous 1♥ - Partenaire 4♥ - ?",q:"Soutien barrage et richesse personnelle en as-clés. Que faites-vous ?",c:"4SA",cat:"other",e:["Malgré le soutien barrage limitant l'information sur la force précise du partenaire, la richesse personnelle en as-clés justifie une exploration RKCB 1430. La réponse obtenue guidera la décision finale de palier."]},
+{p:"Ouest",v:"Personne",h:["A854","AK932","KQ7","4"],a:"Vous 1♥ - Partenaire 4♥ - ?",q:"Soutien barrage et richesse personnelle en as-clés. Que faites-vous ?",c:"4SA",cat:"other",e:["Malgré le soutien barrage limitant l'information sur la force précise du partenaire, la richesse personnelle en as-clés justifie une exploration RKCB 1430. La réponse obtenue guidera la décision finale de palier."]},
 {p:"Sud",v:"Tous",h:["AK942","A85","KQ7","43"],a:"Vous 1♠ - Partenaire 2SA(forcing) - Vous 3♠ - Partenaire 4SA - ?",q:"Le partenaire lance le RKCB 1430, vous détenez trois as-clés. Que répondez-vous ?",c:"5♦",cat:"other",e:["La réponse RKCB 1430 SEF 2024 suit l'échelle des as-clés : 5♣ pour 1 ou 4, 5♦ pour 0 ou 3, 5♥ pour 2 sans la Dame d'atout, 5♠ pour 2 avec la Dame d'atout. Ici la main détient l'As et le Roi de Pique ainsi que l'As de Cœur, soit trois as-clés, d'où 5♦."]},
 {p:"Nord",v:"Personne",h:["K942","AKQ85","A7","43"],a:"Vous 1♥ - Partenaire 3♥ - ?",q:"Fit fort confirmé et main forte. Que faites-vous ?",c:"4SA",cat:"other",e:["Le fit établi et la richesse en as-clés (As, Roi et Dame de Cœur inclus) suffisent pour justifier un RKCB 1430 explorant sérieusement le potentiel de chelem. La décision finale se portera entre 6♥ et une simple manche prudente."]},
 {p:"Est",v:"Tous",h:["AQ84","K943","A72","K5"],a:"Vous 1SA - Partenaire 4SA(invitation chelem) - ?",q:"Invitation directe du partenaire à sans-atout, jeu maximum. Que faites-vous ?",c:"6SA",cat:"other",e:["Un jeu maximum dans la fourchette d'ouverture face à une invitation quantitative justifie l'acceptation directe du chelem à sans-atout. Cette décision reste habituelle dès que le maximum de fourchette est confirmé."]},
@@ -507,12 +557,12 @@ const bank = [
 // ===== OUVERTURE DE 2♦ ELLE-MÊME (1) — accord personnel, forcing manche : trop forte/distribuée pour une ouverture naturelle de 1 mais sous le seuil de 22 H du 2♣ =====
 {p:"Nord",v:"Personne",h:["2","AKQJ85","AKQ7","94"],a:"?",q:"Vous avez une main exceptionnellement distribuée avec dix-neuf points d'honneur, trop forte pour une simple ouverture naturelle de 1♥ mais sous le seuil de 22 H du 2♣. Que faites-vous ?",c:"2♦",cat:"other",e:["Selon cet accord personnel, l'ouverture de 2♦ montre une main forcing manche : dès que la force et la distribution combinées rendent la manche hautement probable quelle que soit la main du partenaire, sans pour autant atteindre les 22 H artificiels du 2♣, le 2♦ décrit assez bien cette zone intermédiaire. Cette main, avec six cœurs solides et un excellent support à Carreau, illustre bien ce profil forcing manche. Le partenaire répondra ensuite selon l'échelle des As, la manche restant généralement acquise et le chelem restant la principale question ouverte."]},
 
-// ===== LEBENSOHL APRÈS INTERVENTION SUR 1SA (5) — 2SA = relais artificiel forçant 3♣, puis passe (clubs naturels) ou nouvelle couleur au palier de 3 (non-forcing) ; enchère directe au palier de 3 = forcing ; cue-bid = demande d'arrêt =====
+// ===== LEBENSOHL APRÈS INTERVENTION SUR 1SA (5) — 2SA = relais artificiel forçant 3♣, puis passe (clubs naturels) ou nouvelle couleur au palier de 3 (non-forcing) ; enchère directe au palier de 3 = forcing ; cue-bid direct = forcing manche AVEC arrêt, cue-bid après le relais 2SA = forcing manche SANS arrêt (voie directe montre l'arrêt) =====
 {p:"Sud",v:"Personne",h:["72","94","AKQJ85","943"],a:"Partenaire 1SA - Adversaire 2♥ - ?",q:"Vous avez une belle couleur de six cartes à Carreau et une main d'ouverture. Que faites-vous ?",c:"3♦",cat:"other",e:["Une couleur longue et solide combinée à des valeurs d'ouverture justifie l'enchère directe au palier de 3, forcing selon la convention Lebensohl. Passer par le relais 2SA serait contraire à l'esprit de cette main forte, réservé aux mains faibles ou intermédiaires. Cette annonce directe transmet immédiatement force et couleur au partenaire."]},
 {p:"Nord",v:"NS",h:["72","94","943","QJ8543"],a:"Partenaire 1SA - Adversaire 2♥ - ?",q:"Vous êtes très faible avec une couleur de six cartes à Trèfle. Que faites-vous ?",c:"2SA",cat:"other",e:["Le relais Lebensohl 2SA reste artificiel, forçant le partenaire à annoncer 3♣ avant que le répondant ne précise sa main. Cette main faible avec une couleur de Trèfle correspond exactement au profil recherché pour ce relais, permettant ensuite de passer 3♣ naturellement. Enchérir directement 3♣ serait mal interprété comme une main forcing."]},
 {p:"Est",v:"Tous",h:["83","72","943","AQJ953"],a:"Partenaire 1SA - Adversaire 2♥ - Vous 2SA - Partenaire 3♣ - ?",q:"Le partenaire complète le relais Lebensohl par 3♣. Vous avez effectivement une belle couleur de Trèfle. Que faites-vous ?",c:"Passe",cat:"other",e:["Après le relais 2SA, passer 3♣ montre une main faible à intermédiaire avec une réelle préférence pour Trèfle, exactement le profil de cette main. Cette séquence complète en deux temps reste non-forcing, contrairement à une enchère directe au palier de 3. Le contrat final se joue à 3♣, généralement confortable compte tenu de la qualité de la couleur."]},
 {p:"Ouest",v:"Personne",h:["83","72","QJ9543","943"],a:"Partenaire 1SA - Adversaire 2♥ - Vous 2SA - Partenaire 3♣ - ?",q:"Le partenaire complète le relais par 3♣, mais votre couleur est en réalité à Carreau. Que faites-vous ?",c:"3♦",cat:"other",e:["Après le relais 2SA, annoncer une nouvelle couleur au palier de 3 reste non-forcing selon Lebensohl, à la différence d'une enchère directe qui aurait été forcing. Cette main faible avec une couleur de Carreau correspond exactement à ce cas de figure. Le partenaire doit passer cette annonce, le processus ayant déjà signalé la faiblesse générale de la main via le relais initial."]},
-{p:"Nord",v:"NS",h:["AQ72","KJ3","A943","72"],a:"Partenaire 1SA - Adversaire 2♥ - ?",q:"Vous avez une main forte avec un arrêt à Cœur. Envisagez-vous le cue-bid de la couleur adverse ?",c:"3♥",cat:"other",e:["Le cue-bid direct de la couleur adverse reste forcing et demande au partenaire de confirmer son propre arrêt dans cette couleur avant de conclure à 3SA. Cette main forte avec un arrêt solide à Cœur correspond exactement au profil recherché pour cette annonce. Passer par le relais Lebensohl serait ici contraire à l'esprit de la main, réservé aux mains faibles ou intermédiaires."]},
+{p:"Nord",v:"NS",h:["AQ72","KJ3","A943","72"],a:"Partenaire 1SA - Adversaire 2♥ - ?",q:"Vous avez quatorze points d'honneur et un arrêt réel à Cœur. Comment installez-vous le forcing manche ?",c:"3♥",cat:"other",e:["Selon la convention retenue ici, la voie directe montre l'arrêt : le cue-bid immédiat de 3♥ installe le forcing manche en garantissant la tenue à Cœur, le partenaire pouvant dès lors annoncer 3SA sans autre vérification. Cette main forte avec un arrêt solide à Cœur correspond exactement au profil recherché pour cette annonce. Passer par le relais Lebensohl serait ici contraire à l'esprit de la main, réservé aux mains faibles ou intermédiaires."]},
 
 // ===== CHECK-BACK STAYMAN / NOUVELLE MINEURE FORCING (5) — après 1m-1M-1SA, la mineure non-licitée relance : soutien 3 cartes, 2e majeure 4 cartes, ou déni (2SA) =====
 {p:"Nord",v:"Personne",h:["72","AQJ85","943","K72"],a:"Partenaire 1♣ - Vous 1♥ - Partenaire 1SA - ?",q:"Vous avez cinq cartes à Cœur et une main invitante. Le partenaire n'a pas montré de soutien direct. Que faites-vous ?",c:"2♦",cat:"other",e:["La mineure non licitée par l'ouvreur relance artificiellement après son rebid 1SA, demandant de préciser un éventuel soutien à trois cartes en Cœur, une seconde majeure de quatre cartes, ou de nier les deux. Cette main invitante avec cinq cœurs justifie cette exploration plutôt qu'un simple 2SA direct qui perdrait l'information distributionnelle. Le partenaire répondra selon sa structure exacte."]},
@@ -521,89 +571,90 @@ const bank = [
 {p:"Ouest",v:"Personne",h:["K85","72","AQ943","K85"],a:"Vous 1♣ - Partenaire 1♥ - Vous 1SA - Partenaire 2♦(check-back) - ?",q:"Le partenaire relance par la mineure non licitée. Vous n'avez ni soutien à trois cartes en Cœur, ni seconde majeure. Que faites-vous ?",c:"2SA",cat:"other",e:["L'absence de soutien à trois cartes et de seconde majeure de quatre cartes se dénie par 2SA, montrant une main plate en bas de la fourchette du rebid initial. Cette réponse reste la plus honnête compte tenu de la structure réelle de la main. Le partenaire jugera ensuite de la suite selon sa propre force, généralement vers 3SA en cas d'intérêt de manche."]},
 {p:"Sud",v:"Tous",h:["72","AKQ85","943","K72"],a:"Partenaire 1♣ - Vous 1♥ - Partenaire 1SA - Vous 2♦(check-back) - Partenaire 2SA - ?",q:"Le partenaire nie soutien et seconde majeure. Vous avez une belle couleur de cinq cœurs et des valeurs de manche. Que faites-vous ?",c:"3SA",cat:"other",e:["Sans fit majeur trouvé après le check-back, la manche se joue naturellement à sans-atout plutôt qu'en forçant un contrat de Cœur à quatre en espérant un fit 5-2. Cette main de valeurs de manche avec une couleur solide en Cœur assure de bonnes chances de réussite à 3SA. Le partenaire, ayant déjà décrit sa main précisément, n'a plus d'information supplémentaire à apporter."]},
 
-// ===== RUBENSOHL SUR INTERVENTION 2♦ (5) — 2♥=transfert ♠ (inchangé) ; 2SA=relais lebensohl puis 3♥=transfert lent ♥ (faible) ; 3♥ direct=transfert rapide (invitant+) ; cue-bid 3♦=demande d'arrêt, forcing =====
-{p:"Nord",v:"Personne",h:["83","QJ854","943","872"],a:"Partenaire 1SA - Adversaire 2♦ - ?",q:"L'adversaire intervient 2♦, bloquant le transfert direct vers Cœur. Vous avez cinq cœurs et une main faible. Que faites-vous ?",c:"2SA",cat:"other",e:["L'intervention adverse à 2♦ occupe la place du transfert naturel vers Cœur, rendant nécessaire la structure Rubensohl : 2SA sert de relais lebensohl, forçant 3♣ avant d'annoncer 3♥ pour compléter le transfert au ralenti. Cette main faible avec cinq cœurs correspond exactement au profil recherché pour cette voie lente. Le contrat final se jouera à 3♥, sans exposer davantage la faiblesse de la main."]},
-{p:"Sud",v:"Tous",h:["83","QJ854","943","872"],a:"Partenaire 1SA - Adversaire 2♦ - Vous 2SA - Partenaire 3♣ - ?",q:"Le partenaire complète le relais par 3♣. Vous confirmez vos cinq cœurs faibles. Que faites-vous ?",c:"3♥",cat:"other",e:["Après le relais 2SA et la réponse forcée 3♣, l'annonce de 3♥ complète le transfert au ralenti caractéristique du Rubensohl, signoff absolu montrant cinq cœurs et une main faible. Cette séquence en deux temps distingue clairement cette main d'une main invitante, qui aurait emprunté la voie rapide en bidant 3♥ directement au tour précédent. Le partenaire passera cette annonce."]},
-{p:"Est",v:"EO",h:["83","AQJ85","K943","72"],a:"Partenaire 1SA - Adversaire 2♦ - ?",q:"L'adversaire intervient 2♦. Vous avez cinq cœurs et une main invitante. Que faites-vous ?",c:"3♥",cat:"other",e:["Une main invitante ou meilleure avec cinq cartes à Cœur emprunte la voie rapide du Rubensohl, annonçant directement 3♥ sans passer par le relais lebensohl. Cette distinction entre voie lente (2SA puis 3♥) et voie rapide (3♥ direct) permet de transmettre à la fois la longueur et la force en une seule différence de séquence. Le partenaire pourra juger de la manche selon sa propre force."]},
-{p:"Ouest",v:"Personne",h:["QJ854","K72","943","72"],a:"Partenaire 1SA - Adversaire 2♦ - ?",q:"L'adversaire intervient 2♦. Vous avez cinq cartes à Pique. Que faites-vous ?",c:"2♥",cat:"other",e:["Le transfert naturel vers Pique reste totalement inchangé par l'intervention adverse à 2♦, ce palier restant disponible sans conflit puisque 2♥ se situe au-dessus de 2♦. Cette main avec cinq cartes à Pique s'exprime donc exactement comme en l'absence d'intervention. Le partenaire acceptera habituellement en annonçant 2♠."]},
-{p:"Sud",v:"Tous",h:["AQ72","K943","QJ3","72"],a:"Partenaire 1SA - Adversaire 2♦ - ?",q:"L'adversaire intervient 2♦. Vous avez une main forte avec un arrêt à Carreau, sans majeure de cinq cartes. Que faites-vous ?",c:"3♦",cat:"other",e:["Le cue-bid de la couleur adverse reste forcing et demande au partenaire de confirmer son propre arrêt à Carreau avant de conclure généralement à 3SA. Cette main forte avec un arrêt solide correspond exactement au profil recherché pour cette annonce, en l'absence de majeure de cinq cartes à transférer. Passer par 2SA relais serait ici inapproprié, cette voie étant réservée aux mains faibles cherchant à transférer vers Cœur."]},
+// ===== RUBENSOHL SUR INTERVENTION 2♦ (6) — paliers de 2 naturels et non-forcing (les transferts sautent avec l'intervention) ; à partir de 2SA, transferts au palier de 3 : 2SA→3♣, 3♣→3♦ (couleur adverse : cue-bid forcing manche sans arrêt), 3♦→3♥, 3♥→3♠ ; transfert puis passe = faible, transfert puis continuation = forcing manche =====
+{p:"Nord",v:"Personne",h:["83","QJ854","943","872"],a:"Partenaire 1SA - Adversaire 2♦ - ?",q:"L'adversaire intervient 2♦, supprimant le transfert Texas vers Cœur. Vous avez cinq cœurs et une main très faible. Que faites-vous ?",c:"2♥",cat:"other",e:["L'intervention fait sauter les transferts au palier de 2 : une nouvelle couleur annoncée à ce palier redevient naturelle et non-forcing. La restructuration Rubensohl ne commence qu'à partir de 2SA, laissant 2♥ et 2♠ disponibles pour la lutte économique. Avec cinq cœurs et trois points d'honneur, 2♥ décrit la main au palier le plus bas ; emprunter un transfert au palier de 3 élèverait inutilement le contrat avec une main dépourvue de valeurs."]},
+{p:"Sud",v:"Tous",h:["83","942","74","QJ8653"],a:"Partenaire 1SA - Adversaire 2♦ - Vous 2SA - Partenaire 3♣ - ?",q:"Vous avez annoncé 2SA sur l'intervention et le partenaire a répondu 3♣. Vous détenez six trèfles et une main très faible. Que faites-vous ?",c:"Passe",cat:"other",e:["Contrairement au Lebensohl, 2SA n'est pas ici un relais mais un transfert pour Trèfle : le partenaire est tenu d'annoncer 3♣, ce qu'il vient de faire. Passer complète le transfert et signe un contrat de 3♣ avec une longue couleur et aucune valeur, exactement le profil de cette main. C'est le principe central du Rubensohl : transférer puis passer décrit une main faible, transférer puis reparler installe le forcing manche."]},
+{p:"Est",v:"EO",h:["83","AQJ85","K943","72"],a:"Partenaire 1SA - Adversaire 2♦ - ?",q:"L'adversaire intervient 2♦. Vous avez cinq cœurs et une main de valeurs de manche. Que faites-vous ?",c:"3♦",cat:"other",e:["En Rubensohl, chaque annonce à partir de 2SA transfère dans la couleur immédiatement supérieure : 3♦ demande donc 3♥ au partenaire. Attention, 3♥ direct ne serait pas naturel mais un transfert pour Pique, et 3♣ transférerait dans la couleur adverse. Le transfert ne dit rien de la force par lui-même : c'est la continuation après la réponse du partenaire, ici 3SA ou 4♥ selon son acceptation, qui installera le forcing manche que justifient ces dix points d'honneur face à une ouverture de 15-17 H."]},
+{p:"Ouest",v:"Personne",h:["QJ854","K72","943","72"],a:"Partenaire 1SA - Adversaire 2♦ - ?",q:"L'adversaire intervient 2♦. Vous avez cinq cartes à Pique et une main faible. Que faites-vous ?",c:"2♠",cat:"other",e:["L'intervention adverse annule les transferts au palier de 2 : 2♥ montrerait désormais de vrais cœurs et non un transfert pour Pique. Avec cinq piques et six points d'honneur, l'annonce naturelle et non-forcing de 2♠ décrit la main sans l'exagérer. Le partenaire est libre de passer, la lutte se réglant au palier le plus économique disponible."]},
+{p:"Sud",v:"Tous",h:["AQ72","K943","QJ3","72"],a:"Partenaire 1SA - Adversaire 2♦ - ?",q:"L'adversaire intervient 2♦. Vous avez douze points d'honneur, un arrêt réel à Carreau et aucune couleur cinquième. Que faites-vous ?",c:"3SA",cat:"other",e:["L'arrêt à Carreau étant en main et aucune couleur n'étant assez longue pour être transférée, l'annonce directe de 3SA décrit la situation sans détour. Le cue-bid Rubensohl de la couleur adverse s'obtient par 3♣, qui transfère dans Carreau : il décrit précisément la main inverse, forcing manche mais dépourvue d'arrêt, invitant le partenaire à annoncer 3SA s'il en possède un. Le prix payé ici est l'abandon d'un éventuel fit majeur quatre-quatre, aucun Stayman n'étant disponible à ce palier après l'intervention."]},
+{p:"Nord",v:"Personne",h:["AQ72","K943","74","QJ3"],a:"Partenaire 1SA - Adversaire 2♦ - ?",q:"L'adversaire intervient 2♦. Vous avez douze points d'honneur, aucune couleur cinquième, et vos deux cartes à Carreau ne constituent pas un arrêt. Que faites-vous ?",c:"3♣",cat:"other",e:["Le transfert dans la couleur adverse constitue le cue-bid Rubensohl : 3♣ demande 3♦, annonce que personne ne souhaite jouer, et installe le forcing manche tout en niant l'arrêt. Le partenaire annoncera 3SA s'il détient lui-même un arrêt à Carreau, faute de quoi le camp cherchera un contrat à la couleur plutôt que de s'exposer à l'entame de la couleur adverse. La donne précédente présente la main symétrique, arrêt en main, qui se règle par 3SA direct sans consulter le partenaire."]},
 
 // ===== ⚠️ ANNEXE (HORS SEF 2024 STANDARD) — OUVERTURE DE 2♦ MULTI (10) — barrage ambigu Cœur/Pique, 5-10 H, 6 cartes ; 2♥ = relais ; distinct du 2♦ forcing manche défini par ailleurs dans cette banque =====
-{p:"Sud",v:"Personne",h:["72","KJ9743","Q943","8"],a:"?",q:"[ANNEXE Multi] Vous avez six cœurs et une main faible de barrage. Que faites-vous en 1re position ?",c:"2♦",cat:"other",e:["Le Multi 2♦ ouvre de façon ambiguë sur une main de barrage classique (5-10 H, 6 cartes) en Cœur ou en Pique, sans préciser laquelle. Cette main correspond exactement au profil recherché : six cœurs et une force de barrage. Le partenaire découvrira la couleur exacte via le relais 2♥ s'il souhaite l'interroger."]},
-{p:"Ouest",v:"EO",h:["QJ8654","943","K72","7"],a:"?",q:"[ANNEXE Multi] Vous avez six piques et une main faible de barrage. Que faites-vous ?",c:"2♦",cat:"other",e:["Le Multi 2♦ couvre indifféremment un barrage en Cœur ou en Pique ; ici la couleur réelle est Pique, mais l'ouverture reste identique dans les deux cas, préservant l'ambiguïté recherchée face à l'adversaire. Le partenaire devra relayer par 2♥ pour connaître la couleur exacte avant toute décision. Cette ambiguïté délibérée complique la défense adverse."]},
-{p:"Est",v:"Tous",h:["83","AKQ743","943","72"],a:"?",q:"[ANNEXE Multi] Vous avez six cœurs solides en haut de la fourchette de barrage. Que faites-vous ?",c:"2♦",cat:"other",e:["Même en haut de la fourchette de barrage (ici neuf points avec une couleur maîtresse), le Multi 2♦ reste l'ouverture appropriée tant que la force ne dépasse pas le seuil de 10 H fixé pour ce barrage ambigu. La qualité de la couleur renforce simplement la solidité du contrat final, sans changer le mécanisme d'ouverture. Le partenaire pourra pousser plus loin après le relais si sa main le justifie."]},
-{p:"Nord",v:"Personne",h:["943","72","Q9843","943"],a:"Partenaire 2♦(Multi) - ?",q:"[ANNEXE Multi] Le partenaire ouvre 2♦ Multi. Vous êtes faible et voulez connaître sa couleur avant d'agir. Que faites-vous ?",c:"2♥",cat:"other",e:["Le relais 2♥ interroge systématiquement l'ouvreur sur sa couleur réelle : il passera avec Cœur, ou corrigera à 2♠ avec Pique. Cette main faible sans préférence propre a tout intérêt à découvrir la couleur exacte avant de décider de la suite. Aucune autre enchère ne serait aussi informative à ce stade."]},
-{p:"Ouest",v:"EO",h:["QJ8654","943","K72","7"],a:"Vous 2♦(Multi) - Partenaire 2♥(relais) - ?",q:"[ANNEXE Multi] Le partenaire relaye par 2♥ pour connaître votre couleur. Vous avez en réalité Pique. Que faites-vous ?",c:"2♠",cat:"other",e:["Face au relais, l'ouvreur corrige systématiquement vers sa couleur réelle : ici Pique, d'où la réponse 2♠. Cette correction reste habituelle et ne dépend d'aucune décision, la couleur ayant déjà été fixée à l'ouverture. Le partenaire connaît désormais la couleur exacte et pourra juger de la suite."]},
-{p:"Sud",v:"Personne",h:["72","KJ9743","Q943","8"],a:"Vous 2♦(Multi) - Partenaire 2♥(relais) - ?",q:"[ANNEXE Multi] Le partenaire relaye par 2♥. Vous avez en réalité Cœur. Que faites-vous ?",c:"Passe",cat:"other",e:["Lorsque la couleur réelle de l'ouvreur est Cœur, le relais 2♥ du partenaire tombe directement dans la bonne couleur : il suffit de passer, sans correction nécessaire. Cette main confirme exactement ce cas de figure. Le contrat se joue donc à 2♥, la couleur réelle de l'ouvreur."]},
-{p:"Est",v:"Tous",h:["AK943","72","AQ85","72"],a:"Partenaire 2♦(Multi, vous) - 2♥(vous, relais) - Partenaire 2♠ - ?",q:"[ANNEXE Multi] Après votre relais, le partenaire corrige à Pique. Vous avez un fit fort et des valeurs de manche. Que faites-vous ?",c:"4♠",cat:"other",e:["Une fois la couleur réelle de l'ouvreur révélée par la correction, un fit fort combiné à des valeurs de manche autorise le saut direct en manche sans exploration supplémentaire. Cette main possède un excellent support à Pique et une force largement suffisante. Cette enchère conclut efficacement l'auction au palier le plus rentable."]},
-{p:"Ouest",v:"Personne",h:["72","AKQ85","K943","72"],a:"Partenaire 2♦(Multi, vous) - 2♥(vous, relais) - Partenaire Passe - ?",q:"[ANNEXE Multi] Le partenaire passe votre relais, confirmant Cœur. Vous avez un fit fort et des valeurs de manche. Que faites-vous ?",c:"4♥",cat:"other",e:["Le passe de l'ouvreur sur le relais confirme la couleur Cœur ; avec un fit fort et des valeurs de manche, le répondant relance directement à 4♥ plutôt que de laisser le contrat à 2♥. Cette main possède un excellent support et une force largement suffisante pour la manche. L'enchère reste possible tant que la ligne adverse n'a pas encore parlé, l'auction n'étant close qu'après trois passes consécutifs."]},
-{p:"Nord",v:"Tous",h:["72","72","AKQJ85","943"],a:"Partenaire 2♦(Multi) - ?",q:"[ANNEXE Multi] Le partenaire ouvre 2♦ Multi. Vous avez une longue couleur de Carreau vous-même et une main forte. Que faites-vous ?",c:"Passe",cat:"other",e:["Cas particulier et avancé du Multi : lorsque le répondant possède lui-même une longue et solide couleur dans la couleur artificielle d'ouverture, passer reste cohérent, le camp étant prêt à défendre ou à conclure sur cette base plutôt que de révéler la couleur réelle de l'ouvreur à l'adversaire. Cette main, avec six carreaux maîtres et une force certaine, illustre ce cas rare mais logique. Cette séquence reste une exception nécessitant un accord de paire clair."]},
-{p:"Sud",v:"EO",h:["AKQ8","KQJ7","A85","Q3"],a:"Partenaire 2♦(Multi) - ?",q:"[ANNEXE Multi] Le partenaire ouvre 2♦ Multi. Vous avez une main exceptionnellement forte avec des valeurs défensives partout. Envisagez-vous le contre ?",c:"Contre",cat:"other",e:["Avec une force défensive écrasante répartie dans toutes les couleurs, le contre punitif simplifié du Multi punit l'ouverture adverse quelle que soit la couleur réelle de l'ouvreur, Cœur ou Pique. Cette main, dépassant largement les vingt points d'honneur avec des arrêts partout, illustre ce cas de figure. Le partenaire convertira ou retirera le contre selon sa propre main."]},
+{p:"Sud",v:"Personne",h:["72","KJ9743","Q943","8"],a:"?",q:"(Hors SEF — Multi 2♦ dans vos accords.) Qu'ouvrez-vous ?",c:"2♦",cat:"other",e:["Le Multi 2♦ ouvre de façon ambiguë sur une main de barrage classique (5-10 H, 6 cartes) en Cœur ou en Pique, sans préciser laquelle. Cette main correspond exactement au profil recherché : six cœurs et une force de barrage. Le partenaire découvrira la couleur exacte via le relais 2♥ s'il souhaite l'interroger."]},
+{p:"Ouest",v:"EO",h:["QJ8654","943","K72","7"],a:"?",q:"(Hors SEF — Multi 2♦ dans vos accords.) Qu'ouvrez-vous ?",c:"2♦",cat:"other",e:["Le Multi 2♦ couvre indifféremment un barrage en Cœur ou en Pique ; ici la couleur réelle est Pique, mais l'ouverture reste identique dans les deux cas, préservant l'ambiguïté recherchée face à l'adversaire. Le partenaire devra relayer par 2♥ pour connaître la couleur exacte avant toute décision. Cette ambiguïté délibérée complique la défense adverse."]},
+{p:"Est",v:"Tous",h:["83","AKQ743","943","72"],a:"?",q:"(Hors SEF — Multi 2♦ dans vos accords.) Qu'ouvrez-vous ?",c:"2♦",cat:"other",e:["Même en haut de la fourchette de barrage (ici neuf points avec une couleur maîtresse), le Multi 2♦ reste l'ouverture appropriée tant que la force ne dépasse pas le seuil de 10 H fixé pour ce barrage ambigu. La qualité de la couleur renforce simplement la solidité du contrat final, sans changer le mécanisme d'ouverture. Le partenaire pourra pousser plus loin après le relais si sa main le justifie."]},
+{p:"Nord",v:"Personne",h:["943","72","Q9843","943"],a:"Partenaire 2♦(Multi) - ?",q:"(Hors SEF — Multi 2♦ dans vos accords.) Que faites-vous ?",c:"2♥",cat:"other",e:["Le relais 2♥ interroge systématiquement l'ouvreur sur sa couleur réelle : il passera avec Cœur, ou corrigera à 2♠ avec Pique. Cette main faible sans préférence propre a tout intérêt à découvrir la couleur exacte avant de décider de la suite. Aucune autre enchère ne serait aussi informative à ce stade."]},
+{p:"Ouest",v:"EO",h:["QJ8654","943","K72","7"],a:"Vous 2♦(Multi) - Partenaire 2♥(relais) - ?",q:"(Hors SEF — Multi 2♦ dans vos accords.) Que faites-vous ?",c:"2♠",cat:"other",e:["Face au relais, l'ouvreur corrige systématiquement vers sa couleur réelle : ici Pique, d'où la réponse 2♠. Cette correction reste habituelle et ne dépend d'aucune décision, la couleur ayant déjà été fixée à l'ouverture. Le partenaire connaît désormais la couleur exacte et pourra juger de la suite."]},
+{p:"Sud",v:"Personne",h:["72","KJ9743","Q943","8"],a:"Vous 2♦(Multi) - Partenaire 2♥(relais) - ?",q:"(Hors SEF — Multi 2♦ dans vos accords.) Que faites-vous ?",c:"Passe",cat:"other",e:["Lorsque la couleur réelle de l'ouvreur est Cœur, le relais 2♥ du partenaire tombe directement dans la bonne couleur : il suffit de passer, sans correction nécessaire. Cette main confirme exactement ce cas de figure. Le contrat se joue donc à 2♥, la couleur réelle de l'ouvreur."]},
+{p:"Est",v:"Tous",h:["AK943","72","AQ85","72"],a:"Partenaire 2♦(Multi, vous) - 2♥(vous, relais) - Partenaire 2♠ - ?",q:"(Hors SEF — Multi 2♦ dans vos accords.) Que faites-vous ?",c:"4♠",cat:"other",e:["Une fois la couleur réelle de l'ouvreur révélée par la correction, un fit fort combiné à des valeurs de manche autorise le saut direct en manche sans exploration supplémentaire. Cette main possède un excellent support à Pique et une force largement suffisante. Cette enchère conclut efficacement l'auction au palier le plus rentable."]},
+{p:"Ouest",v:"Personne",h:["72","AKQ85","K943","72"],a:"Partenaire 2♦(Multi, vous) - 2♥(vous, relais) - Partenaire Passe - ?",q:"(Hors SEF — Multi 2♦ dans vos accords.) Que faites-vous ?",c:"4♥",cat:"other",e:["Le passe de l'ouvreur sur le relais confirme la couleur Cœur ; avec un fit fort et des valeurs de manche, le répondant relance directement à 4♥ plutôt que de laisser le contrat à 2♥. Cette main possède un excellent support et une force largement suffisante pour la manche. L'enchère reste possible tant que la ligne adverse n'a pas encore parlé, l'auction n'étant close qu'après trois passes consécutifs."]},
+{p:"Nord",v:"Tous",h:["72","72","AKQJ85","943"],a:"Partenaire 2♦(Multi) - ?",q:"(Hors SEF — Multi 2♦ dans vos accords.) Que faites-vous ?",c:"Passe",cat:"other",e:["Cas particulier et avancé du Multi : lorsque le répondant possède lui-même une longue et solide couleur dans la couleur artificielle d'ouverture, passer reste cohérent, le camp étant prêt à défendre ou à conclure sur cette base plutôt que de révéler la couleur réelle de l'ouvreur à l'adversaire. Cette main, avec six carreaux maîtres et une force certaine, illustre ce cas rare mais logique. Cette séquence reste une exception nécessitant un accord de paire clair."]},
+{p:"Sud",v:"EO",h:["AKQ8","KQJ7","A85","Q3"],a:"Partenaire 2♦(Multi) - ?",q:"(Hors SEF — Multi 2♦ dans vos accords.) Que faites-vous ?",c:"Contre",cat:"other",e:["Avec une force défensive écrasante répartie dans toutes les couleurs, le contre punitif simplifié du Multi punit l'ouverture adverse quelle que soit la couleur réelle de l'ouvreur, Cœur ou Pique. Cette main, dépassant largement les vingt points d'honneur avec des arrêts partout, illustre ce cas de figure. Le partenaire convertira ou retirera le contre selon sa propre main."]},
 
 // ===== REDEMANDE DE L'OUVREUR (20) — palier minima (12-14H), bicolore cher/inversé (16+H forcing), saut à SA (18-19H régulière), bicolore éco (12-15H) =====
-{p:"Sud",v:"Personne",h:["7","Q94","K84","AKJ953"],a:"1♣ - Partenaire 1♥ - ?",q:"[Redemande] Palier minima. Que faites-vous ?",c:"2♣",cat:"other",e:["Une main minimum d'ouverture (12-14 H) avec une longue couleur personnelle se redemande simplement en répétant cette couleur au palier le plus bas, ici Trèfle avec six cartes. Cette enchère reste non-forcing, laissant le partenaire libre de passer avec un jeu faible. Le palier minima constitue la redemande la plus fréquente et la plus économique du système."]},
-{p:"Nord",v:"NS",h:["K943","72","AQ85","K94"],a:"1♦ - Partenaire 1♠ - ?",q:"[Redemande] Palier minima, soutien direct. Que faites-vous ?",c:"2♠",cat:"other",e:["Un soutien de quatre cartes à la majeure du répondant, combiné à une force minimum d'ouverture, se montre directement par le simple soutien au palier de 2. Cette enchère non-forcing reste la plus précise et la plus économique dans cette fourchette de points. Le partenaire jugera de la suite selon sa propre force."]},
-{p:"Est",v:"Tous",h:["Q72","AKJ85","K94","72"],a:"1♥ - Partenaire 1♠ - ?",q:"[Redemande] Palier minima, main régulière sans soutien. Que faites-vous ?",c:"1SA",cat:"other",e:["Sans soutien à la majeure du répondant et avec une distribution régulière, 1SA reste la redemande la plus précise pour une main minimum d'ouverture. Cette annonce non-forcing décrit immédiatement la force et la forme de la main. Le partenaire pourra relancer avec la quatrième couleur forcing s'il souhaite en savoir davantage."]},
-{p:"Ouest",v:"Personne",h:["K72","Q943","7","AKJ94"],a:"1♣ - Partenaire 1♦ - ?",q:"[Redemande] Palier minima, répétition de couleur. Que faites-vous ?",c:"2♣",cat:"other",e:["Une main minimum avec cinq cartes à Trèfle se redemande en répétant simplement cette couleur, message non-forcing standard de la fourchette basse. Cette enchère reste la plus économique disponible à ce stade. Le partenaire évaluera la suite selon sa propre main."]},
-{p:"Sud",v:"Tous",h:["72","K94","AQ943","K72"],a:"1♦ - Partenaire 1♥ - ?",q:"[Redemande] Palier minima, soutien à trois cartes. Que faites-vous ?",c:"2♥",cat:"other",e:["Un soutien de trois cartes à la majeure combiné à une force minimum d'ouverture justifie le simple soutien direct au palier de 2. Cette enchère non-forcing reste conforme au profil d'une main de 12-14 H. Le partenaire jugera de la suite selon sa propre force."]},
+{p:"Sud",v:"Personne",h:["7","Q94","K84","AKJ953"],a:"1♣ - Partenaire 1♥ - ?",q:"Que redemandez-vous ?",c:"2♣",cat:"other",e:["Une main minimum d'ouverture (12-14 H) avec une longue couleur personnelle se redemande simplement en répétant cette couleur au palier le plus bas, ici Trèfle avec six cartes. Cette enchère reste non-forcing, laissant le partenaire libre de passer avec un jeu faible. Le palier minima constitue la redemande la plus fréquente et la plus économique du système."]},
+{p:"Nord",v:"NS",h:["K943","72","AQ85","K94"],a:"1♦ - Partenaire 1♠ - ?",q:"Que redemandez-vous ?",c:"2♠",cat:"other",e:["Un soutien de quatre cartes à la majeure du répondant, combiné à une force minimum d'ouverture, se montre directement par le simple soutien au palier de 2. Cette enchère non-forcing reste la plus précise et la plus économique dans cette fourchette de points. Le partenaire jugera de la suite selon sa propre force."]},
+{p:"Est",v:"Tous",h:["Q72","AKJ85","K94","72"],a:"1♥ - Partenaire 1♠ - ?",q:"Que redemandez-vous ?",c:"1SA",cat:"other",e:["Sans soutien à la majeure du répondant et avec une distribution régulière, 1SA reste la redemande la plus précise pour une main minimum d'ouverture. Cette annonce non-forcing décrit immédiatement la force et la forme de la main. Le partenaire pourra relancer avec la quatrième couleur forcing s'il souhaite en savoir davantage."]},
+{p:"Ouest",v:"Personne",h:["K72","Q943","7","AKJ94"],a:"1♣ - Partenaire 1♦ - ?",q:"Que redemandez-vous ?",c:"2♣",cat:"other",e:["Une main minimum avec cinq cartes à Trèfle se redemande en répétant simplement cette couleur, message non-forcing standard de la fourchette basse. Cette enchère reste la plus économique disponible à ce stade. Le partenaire évaluera la suite selon sa propre main."]},
+{p:"Sud",v:"Tous",h:["72","K94","AQ943","K72"],a:"1♦ - Partenaire 1♥ - ?",q:"Que redemandez-vous ?",c:"2♥",cat:"other",e:["Un soutien de trois cartes à la majeure combiné à une force minimum d'ouverture justifie le simple soutien direct au palier de 2. Cette enchère non-forcing reste conforme au profil d'une main de 12-14 H. Le partenaire jugera de la suite selon sa propre force."]},
 
-{p:"Nord",v:"Personne",h:["AQ85","72","K","AKJ943"],a:"1♣ - Partenaire 1♥ - ?",q:"[Redemande] Bicolore cher / inversé, 16+ H forcing. Que faites-vous ?",c:"2♠",cat:"other",e:["Une main forte (16+ H) avec deux couleurs, dont la seconde de rang supérieur à la première, se redemande par le bicolore cher (inversé) : ici 2♠ après 1♣, Pique étant plus cher que Trèfle. Cette enchère reste forcing une ronde au minimum, contrairement au palier minima. Le partenaire ne peut pas passer et doit décrire sa main plus précisément."]},
-{p:"Est",v:"Tous",h:["AQ94","72","AKJ85","K3"],a:"1♦ - Partenaire 1♥ - ?",q:"[Redemande] Bicolore cher / inversé. Que faites-vous ?",c:"2♠",cat:"other",e:["La seconde couleur, ici Pique, se classant au-dessus de la première (Carreau), la redemande à 2♠ constitue un bicolore cher forcing, montrant 16+ H. Cette annonce diffère nettement d'un simple changement de couleur qui resterait non-forcing à un niveau inférieur. Le partenaire doit poursuivre l'enchère."]},
-{p:"Ouest",v:"Personne",h:["72","AKJ8","3","AKQ943"],a:"1♣ - Partenaire 1♦ - ?",q:"[Redemande] Bicolore cher / inversé. Que faites-vous ?",c:"2♥",cat:"other",e:["Cœur se classant au-dessus de Trèfle, la redemande à 2♥ constitue un bicolore cher forcing typique, montrant une main de 16+ H avec deux couleurs de qualité. Cette main possède six trèfles solides et quatre cœurs, largement suffisante pour ce type d'annonce. Le partenaire ne peut pas passer à ce niveau de force annoncée."]},
-{p:"Sud",v:"Tous",h:["72","AKJ8","AQ943","K3"],a:"1♦ - Partenaire 1♠ - ?",q:"[Redemande] Bicolore cher / inversé. Que faites-vous ?",c:"2♥",cat:"other",e:["Cœur se classant au-dessus de Carreau, cette redemande à 2♥ constitue un bicolore cher forcing, montrant 16+ H avec deux couleurs de qualité. La main possède cinq carreaux et quatre cœurs solides, un profil classique pour ce type d'annonce. Le partenaire doit poursuivre le développement de l'enchère."]},
-{p:"Nord",v:"NS",h:["72","K3","AJ85","AKQ94"],a:"1♣ - Partenaire 1♠ - ?",q:"[Redemande] Bicolore cher / inversé, mineure-mineure. Que faites-vous ?",c:"2♦",cat:"other",e:["Même entre deux mineures, le principe du bicolore cher s'applique : Carreau se classant au-dessus de Trèfle, la redemande à 2♦ montre 16+ H forcing. Cette main possède cinq trèfles et quatre carreaux solides, correspondant exactement à ce profil. Le partenaire ne peut pas passer compte tenu de la force annoncée."]},
+{p:"Nord",v:"Personne",h:["AQ85","72","K","AKJ943"],a:"1♣ - Partenaire 1♥ - ?",q:"Que redemandez-vous ?",c:"2♠",cat:"other",e:["Une main forte (16+ H) avec deux couleurs, dont la seconde de rang supérieur à la première, se redemande par le bicolore cher (inversé) : ici 2♠ après 1♣, Pique étant plus cher que Trèfle. Cette enchère reste forcing une ronde au minimum, contrairement au palier minima. Le partenaire ne peut pas passer et doit décrire sa main plus précisément."]},
+{p:"Est",v:"Tous",h:["AQ94","72","AKJ85","K3"],a:"1♦ - Partenaire 1♥ - ?",q:"Que redemandez-vous ?",c:"2♠",cat:"other",e:["La seconde couleur, ici Pique, se classant au-dessus de la première (Carreau), la redemande à 2♠ constitue un bicolore cher forcing, montrant 16+ H. Cette annonce diffère nettement d'un simple changement de couleur qui resterait non-forcing à un niveau inférieur. Le partenaire doit poursuivre l'enchère."]},
+{p:"Ouest",v:"Personne",h:["72","AKJ8","3","AKQ943"],a:"1♣ - Partenaire 1♦ - ?",q:"Que redemandez-vous ?",c:"2♥",cat:"other",e:["Cœur se classant au-dessus de Trèfle, la redemande à 2♥ constitue un bicolore cher forcing typique, montrant une main de 16+ H avec deux couleurs de qualité. Cette main possède six trèfles solides et quatre cœurs, largement suffisante pour ce type d'annonce. Le partenaire ne peut pas passer à ce niveau de force annoncée."]},
+{p:"Sud",v:"Tous",h:["72","AKJ8","AQ943","K3"],a:"1♦ - Partenaire 1♠ - ?",q:"Que redemandez-vous ?",c:"2♥",cat:"other",e:["Cœur se classant au-dessus de Carreau, cette redemande à 2♥ constitue un bicolore cher forcing, montrant 16+ H avec deux couleurs de qualité. La main possède cinq carreaux et quatre cœurs solides, un profil classique pour ce type d'annonce. Le partenaire doit poursuivre le développement de l'enchère."]},
+{p:"Nord",v:"NS",h:["72","K3","AJ85","AKQ94"],a:"1♣ - Partenaire 1♠ - ?",q:"Que redemandez-vous ?",c:"2♦",cat:"other",e:["Même entre deux mineures, le principe du bicolore cher s'applique : Carreau se classant au-dessus de Trèfle, la redemande à 2♦ montre 16+ H forcing. Cette main possède cinq trèfles et quatre carreaux solides, correspondant exactement à ce profil. Le partenaire ne peut pas passer compte tenu de la force annoncée."]},
 
-{p:"Est",v:"EO",h:["K85","Q72","AKJ","AQ94"],a:"1♣ - Partenaire 1♥ - ?",q:"[Redemande] Saut à SA, 18-19 H régulière. Que faites-vous ?",c:"2SA",cat:"other",e:["Une main régulière forte (18-19 H) sans fit pour la majeure du répondant se redemande directement par le saut à 2SA, décrivant précisément cette fourchette de force intermédiaire entre le palier minima et l'ouverture forte. Cette annonce reste plus précise qu'un bicolore cher, réservé aux mains bicolores. Le partenaire connaît immédiatement une fourchette de points étroite."]},
-{p:"Ouest",v:"Personne",h:["Q72","K85","AKJ8","AQ4"],a:"1♦ - Partenaire 1♠ - ?",q:"[Redemande] Saut à SA, 18-19 H régulière. Que faites-vous ?",c:"2SA",cat:"other",e:["Une distribution régulière avec 19 H et sans soutien pour la majeure du répondant justifie le saut direct à 2SA. Cette annonce reste la plus précise pour cette fourchette de force, distincte du palier minima ou du bicolore cher réservé aux mains distribuées. Le partenaire pourra explorer la manche ou le chelem selon sa propre force."]},
-{p:"Sud",v:"Tous",h:["K85","AQ94","Q72","AKJ"],a:"1♣ - Partenaire 1♦ - ?",q:"[Redemande] Saut à SA, 18-19 H régulière. Que faites-vous ?",c:"2SA",cat:"other",e:["Sans majeure de quatre cartes disponible et avec une distribution régulière forte, l'ouverture s'est portée sur la mineure la plus longue à égalité, Trèfle par défaut. La redemande à 2SA décrit ensuite précisément cette main de 18-19 H. Le partenaire dispose d'une image complète et étroite pour la suite."]},
-{p:"Nord",v:"Personne",h:["K85","Q72","AQ94","AKJ"],a:"1♦ - Partenaire 1♥ - ?",q:"[Redemande] Saut à SA, 18-19 H régulière. Que faites-vous ?",c:"2SA",cat:"other",e:["Une main régulière forte sans soutien pour la majeure du répondant se redemande par le saut direct à 2SA, message précis de 18-19 H. Cette annonce reste préférable à toute exploration bicolore, la main étant véritablement équilibrée. Le partenaire pourra juger de la manche selon sa propre force."]},
-{p:"Est",v:"Tous",h:["K72","Q85","AJ94","AKQ"],a:"1♣ - Partenaire 1♠ - ?",q:"[Redemande] Saut à SA, 18-19 H régulière. Que faites-vous ?",c:"2SA",cat:"other",e:["Sans quatrième carte à Pique pour soutenir le répondant, cette main régulière forte se redemande naturellement par le saut à 2SA plutôt que par un bicolore. La force de 19 H correspond exactement à cette fourchette. Le partenaire connaît immédiatement une image précise et étroite de la main."]},
+{p:"Est",v:"EO",h:["K85","Q72","AKJ","AQ94"],a:"1♣ - Partenaire 1♥ - ?",q:"Que redemandez-vous ?",c:"2SA",cat:"other",e:["Une main régulière forte (18-19 H) sans fit pour la majeure du répondant se redemande directement par le saut à 2SA, décrivant précisément cette fourchette de force intermédiaire entre le palier minima et l'ouverture forte. Cette annonce reste plus précise qu'un bicolore cher, réservé aux mains bicolores. Le partenaire connaît immédiatement une fourchette de points étroite."]},
+{p:"Ouest",v:"Personne",h:["Q72","K85","AKJ8","AQ4"],a:"1♦ - Partenaire 1♠ - ?",q:"Que redemandez-vous ?",c:"2SA",cat:"other",e:["Une distribution régulière avec 19 H et sans soutien pour la majeure du répondant justifie le saut direct à 2SA. Cette annonce reste la plus précise pour cette fourchette de force, distincte du palier minima ou du bicolore cher réservé aux mains distribuées. Le partenaire pourra explorer la manche ou le chelem selon sa propre force."]},
+{p:"Sud",v:"Tous",h:["K85","AQ94","Q72","AKJ"],a:"1♣ - Partenaire 1♦ - ?",q:"Que redemandez-vous ?",c:"2SA",cat:"other",e:["Sans majeure de quatre cartes disponible et avec une distribution régulière forte, l'ouverture s'est portée sur la mineure la plus longue à égalité, Trèfle par défaut. La redemande à 2SA décrit ensuite précisément cette main de 18-19 H. Le partenaire dispose d'une image complète et étroite pour la suite."]},
+{p:"Nord",v:"Personne",h:["K85","Q72","AQ94","AKJ"],a:"1♦ - Partenaire 1♥ - ?",q:"Que redemandez-vous ?",c:"2SA",cat:"other",e:["Une main régulière forte sans soutien pour la majeure du répondant se redemande par le saut direct à 2SA, message précis de 18-19 H. Cette annonce reste préférable à toute exploration bicolore, la main étant véritablement équilibrée. Le partenaire pourra juger de la manche selon sa propre force."]},
+{p:"Est",v:"Tous",h:["K72","Q85","AJ94","AKQ"],a:"1♣ - Partenaire 1♠ - ?",q:"Que redemandez-vous ?",c:"2SA",cat:"other",e:["Sans quatrième carte à Pique pour soutenir le répondant, cette main régulière forte se redemande naturellement par le saut à 2SA plutôt que par un bicolore. La force de 19 H correspond exactement à cette fourchette. Le partenaire connaît immédiatement une image précise et étroite de la main."]},
 
-{p:"Nord",v:"Personne",h:["Q72","AKJ85","9","K943"],a:"1♥ - Partenaire 1♠ - ?",q:"[Redemande] Bicolore éco, 12-15 H. Que faites-vous ?",c:"2♣",cat:"other",e:["Trèfle se classant en dessous de Cœur, cette redemande constitue un bicolore économique, non-forcing de force et disponible dès 12 H. Cette main possède cinq cœurs et quatre trèfles, profil classique de ce type d'annonce. Le partenaire peut passer si sa main est faible."]},
-{p:"Sud",v:"Tous",h:["Q72","AKJ85","K943","9"],a:"1♥ - Partenaire 1♠ - ?",q:"[Redemande] Bicolore éco. Que faites-vous ?",c:"2♦",cat:"other",e:["Carreau se classant en dessous de Cœur, cette redemande à 2♦ reste un bicolore économique non-forcing, disponible dès 12 H. La main possède cinq cœurs et quatre carreaux, correspondant exactement à ce profil. Le partenaire peut passer sans risquer de manquer une manche."]},
-{p:"Est",v:"EO",h:["7","Q94","AKJ85","K943"],a:"1♦ - Partenaire 1♥ - ?",q:"[Redemande] Bicolore éco. Que faites-vous ?",c:"2♣",cat:"other",e:["Trèfle se classant en dessous de Carreau, cette redemande à 2♣ constitue un bicolore économique, non-forcing dès 12 H. La main possède cinq carreaux et quatre trèfles, profil typique de cette annonce. Le partenaire reste libre de passer avec un jeu minimum."]},
-{p:"Ouest",v:"Personne",h:["Q94","7","AKJ85","K943"],a:"1♦ - Partenaire 1♠ - ?",q:"[Redemande] Bicolore éco. Que faites-vous ?",c:"2♣",cat:"other",e:["Trèfle se classant en dessous de Carreau, cette redemande reste un bicolore économique non-forcing, disponible dès 12 H. La main possède cinq carreaux et quatre trèfles, correspondant exactement à ce cas. Le partenaire peut passer sans crainte de manquer une manche."]},
-{p:"Sud",v:"Tous",h:["AKJ85","K943","72","94"],a:"1♠ - Partenaire 2♦(2/1) - ?",q:"[Redemande] Bicolore éco après réponse forcing manche. Que faites-vous ?",c:"2♥",cat:"other",e:["Cœur se classant en dessous de Pique, cette redemande reste un bicolore économique dans sa mécanique de classement, même si le 2/1 du répondant a déjà forcé la manche : la distinction de force entre bicolore éco et cher perd alors de son importance puisque l'arrêt en dessous de la manche n'est plus possible. Cette main possède cinq piques et quatre cœurs, décrits naturellement à moindre coût. Le développement se poursuivra nécessairement jusqu'à la manche au minimum."]},
+{p:"Nord",v:"Personne",h:["Q72","AKJ85","9","K943"],a:"1♥ - Partenaire 1♠ - ?",q:"Que redemandez-vous ?",c:"2♣",cat:"other",e:["Trèfle se classant en dessous de Cœur, cette redemande constitue un bicolore économique, non-forcing de force et disponible dès 12 H. Cette main possède cinq cœurs et quatre trèfles, profil classique de ce type d'annonce. Le partenaire peut passer si sa main est faible."]},
+{p:"Sud",v:"Tous",h:["Q72","AKJ85","K943","9"],a:"1♥ - Partenaire 1♠ - ?",q:"Que redemandez-vous ?",c:"2♦",cat:"other",e:["Carreau se classant en dessous de Cœur, cette redemande à 2♦ reste un bicolore économique non-forcing, disponible dès 12 H. La main possède cinq cœurs et quatre carreaux, correspondant exactement à ce profil. Le partenaire peut passer sans risquer de manquer une manche."]},
+{p:"Est",v:"EO",h:["7","Q94","AKJ85","K943"],a:"1♦ - Partenaire 1♥ - ?",q:"Que redemandez-vous ?",c:"2♣",cat:"other",e:["Trèfle se classant en dessous de Carreau, cette redemande à 2♣ constitue un bicolore économique, non-forcing dès 12 H. La main possède cinq carreaux et quatre trèfles, profil typique de cette annonce. Le partenaire reste libre de passer avec un jeu minimum."]},
+{p:"Ouest",v:"Personne",h:["Q94","7","AKJ85","K943"],a:"1♦ - Partenaire 1♠ - ?",q:"Que redemandez-vous ?",c:"2♣",cat:"other",e:["Trèfle se classant en dessous de Carreau, cette redemande reste un bicolore économique non-forcing, disponible dès 12 H. La main possède cinq carreaux et quatre trèfles, correspondant exactement à ce cas. Le partenaire peut passer sans crainte de manquer une manche."]},
+{p:"Sud",v:"Tous",h:["AKJ85","K943","72","94"],a:"1♠ - Partenaire 2♦(2/1) - ?",q:"Que redemandez-vous ?",c:"2♥",cat:"other",e:["Cœur se classant en dessous de Pique, cette redemande reste un bicolore économique dans sa mécanique de classement, même si le 2/1 du répondant a déjà forcé la manche : la distinction de force entre bicolore éco et cher perd alors de son importance puisque l'arrêt en dessous de la manche n'est plus possible. Cette main possède cinq piques et quatre cœurs, décrits naturellement à moindre coût. Le développement se poursuivra nécessairement jusqu'à la manche au minimum."]},
 
 // ===== RÉVEIL EN 4E POSITION (10) — séquence : ouverture adverse - Passe - Passe(partenaire) - ? ; Contre de réveil = 9-14 H, tolérance dans les trois autres couleurs ; 1SA de réveil = 11-14 H, équilibrée, arrêt dans la couleur d'ouverture =====
-{p:"Nord",v:"Personne",h:["K943","A872","94","Q72"],a:"1♣ - Passe - Passe - ?",q:"[Réveil] L'adversaire ouvre 1♣, deux passes suivent. Vous avez un jeu court à Trèfle avec tolérance ailleurs. Que faites-vous ?",c:"Contre",cat:"other",e:["Le passe du partenaire en 3e position ne dénie pas nécessairement des valeurs : il peut simplement manquer de la distribution ou du palier pour agir directement. En 4e position, le réveil par contre reste possible dès 9 H avec une tolérance dans les trois couleurs restantes, ici renforcée par la brièveté en Trèfle. Passer laisserait probablement filer une main compétitive du côté adverse."]},
-{p:"Sud",v:"NS",h:["A94","K872","Q72","943"],a:"1♦ - Passe - Passe - ?",q:"[Réveil] L'adversaire ouvre 1♦, deux passes suivent. Vous avez un jeu court à Carreau avec tolérance ailleurs. Que faites-vous ?",c:"Contre",cat:"other",e:["Une distribution courte dans la couleur d'ouverture adverse combinée à une tolérance dans les trois autres couleurs justifie le réveil par contre, même avec une force minimale de 9 H. Cette main correspond exactement à ce profil de réveil classique. Le partenaire, ayant simplement passé faute d'opportunité directe, pourra maintenant répondre normalement."]},
-{p:"Est",v:"Tous",h:["AQ85","72","K943","K72"],a:"1♥ - Passe - Passe - ?",q:"[Réveil] L'adversaire ouvre 1♥, deux passes suivent. Vous avez une main de force moyenne avec tolérance dans les trois autres couleurs. Que faites-vous ?",c:"Contre",cat:"other",e:["Douze points d'honneur avec une tolérance correcte dans les trois couleurs restantes dépassent largement le minimum requis pour un réveil par contre. Passer ici laisserait sans réaction une main pourtant tout à fait compétitive. Le partenaire pourra répondre dans sa meilleure couleur sans contrainte imposée."]},
-{p:"Ouest",v:"Personne",h:["72","AKJ8","K943","Q72"],a:"1♠ - Passe - Passe - ?",q:"[Réveil] L'adversaire ouvre 1♠, deux passes suivent. Vous avez une main forte avec tolérance dans les trois autres couleurs. Que faites-vous ?",c:"Contre",cat:"other",e:["Avec treize points d'honneur en haut de la fourchette de réveil, cette main dépasse largement le seuil minimum de 9 H requis. La tolérance dans les trois couleurs restantes, combinée à la brièveté en Pique, correspond exactement au profil recherché pour ce contre. Passer serait beaucoup trop passif compte tenu de la force disponible."]},
-{p:"Nord",v:"NS",h:["Q943","K872","A72","94"],a:"1♣ - Passe - Passe - ?",q:"[Réveil] L'adversaire ouvre 1♣, deux passes suivent. Main minimum avec tolérance dans les trois autres couleurs. Que faites-vous ?",c:"Contre",cat:"other",e:["Neuf points d'honneur représentent le minimum requis pour un réveil par contre, mais la tolérance dans les trois couleurs restantes justifie pleinement cette action même en bas de fourchette. Le partenaire ayant passé sans opportunité ne signifie pas une main sans valeur. Réveiller ici complique l'entrée en jeu de l'adversaire, qui possède manifestement moins que d'habitude après ce double passe."]},
+{p:"Nord",v:"Personne",h:["K943","A872","94","Q72"],a:"1♣ - Passe - Passe - ?",q:"Que faites-vous en position de réveil ?",c:"Contre",cat:"other",e:["Le passe du partenaire en 3e position ne dénie pas nécessairement des valeurs : il peut simplement manquer de la distribution ou du palier pour agir directement. En 4e position, le réveil par contre reste possible dès 9 H avec une tolérance dans les trois couleurs restantes, ici renforcée par la brièveté en Trèfle. Passer laisserait probablement filer une main compétitive du côté adverse."]},
+{p:"Sud",v:"NS",h:["A94","K872","Q72","943"],a:"1♦ - Passe - Passe - ?",q:"Que faites-vous en position de réveil ?",c:"Contre",cat:"other",e:["Une distribution courte dans la couleur d'ouverture adverse combinée à une tolérance dans les trois autres couleurs justifie le réveil par contre, même avec une force minimale de 9 H. Cette main correspond exactement à ce profil de réveil classique. Le partenaire, ayant simplement passé faute d'opportunité directe, pourra maintenant répondre normalement."]},
+{p:"Est",v:"Tous",h:["AQ85","72","K943","K72"],a:"1♥ - Passe - Passe - ?",q:"Que faites-vous en position de réveil ?",c:"Contre",cat:"other",e:["Douze points d'honneur avec une tolérance correcte dans les trois couleurs restantes dépassent largement le minimum requis pour un réveil par contre. Passer ici laisserait sans réaction une main pourtant tout à fait compétitive. Le partenaire pourra répondre dans sa meilleure couleur sans contrainte imposée."]},
+{p:"Ouest",v:"Personne",h:["72","AKJ8","K943","Q72"],a:"1♠ - Passe - Passe - ?",q:"Que faites-vous en position de réveil ?",c:"Contre",cat:"other",e:["Avec treize points d'honneur en haut de la fourchette de réveil, cette main dépasse largement le seuil minimum de 9 H requis. La tolérance dans les trois couleurs restantes, combinée à la brièveté en Pique, correspond exactement au profil recherché pour ce contre. Passer serait beaucoup trop passif compte tenu de la force disponible."]},
+{p:"Nord",v:"NS",h:["Q943","K872","A72","94"],a:"1♣ - Passe - Passe - ?",q:"Que faites-vous en position de réveil ?",c:"Contre",cat:"other",e:["Neuf points d'honneur représentent le minimum requis pour un réveil par contre, mais la tolérance dans les trois couleurs restantes justifie pleinement cette action même en bas de fourchette. Le partenaire ayant passé sans opportunité ne signifie pas une main sans valeur. Réveiller ici complique l'entrée en jeu de l'adversaire, qui possède manifestement moins que d'habitude après ce double passe."]},
 
-{p:"Sud",v:"Tous",h:["K943","A72","Q85","K94"],a:"1♣ - Passe - Passe - ?",q:"[Réveil] L'adversaire ouvre 1♣, deux passes suivent. Main régulière avec arrêt à Trèfle. Que faites-vous ?",c:"1SA",cat:"other",e:["Une distribution régulière avec un arrêt solide dans la couleur d'ouverture adverse justifie le réveil par 1SA plutôt que par contre, décrivant précisément une main de 11-14 H équilibrée. Cette annonce reste plus informative qu'un contre qui laisserait le choix de couleur au partenaire sans nécessité ici. Le partenaire pourra explorer la suite normalement, comme après une ouverture directe de 1SA."]},
-{p:"Est",v:"EO",h:["K943","A72","KQ5","Q94"],a:"1♦ - Passe - Passe - ?",q:"[Réveil] L'adversaire ouvre 1♦, deux passes suivent. Main régulière forte avec arrêt à Carreau. Que faites-vous ?",c:"1SA",cat:"other",e:["Un arrêt solide dans la couleur d'ouverture adverse (Roi-Dame) combiné à une distribution régulière et 14 H, en haut de la fourchette de réveil, justifie pleinement le 1SA plutôt qu'un contre moins précis. Cette annonce décrit immédiatement force et arrêt au partenaire. La main mérite cette précision plutôt qu'un contre qui resterait ambigu sur la nature exacte du jeu."]},
-{p:"Ouest",v:"Personne",h:["K943","Q85","A72","K94"],a:"1♥ - Passe - Passe - ?",q:"[Réveil] L'adversaire ouvre 1♥, deux passes suivent. Main régulière avec arrêt à Cœur. Que faites-vous ?",c:"1SA",cat:"other",e:["L'arrêt à Cœur combiné à une distribution parfaitement régulière justifie le réveil par 1SA, message précis de 11-14 H équilibrée avec arrêt dans la couleur adverse. Cette annonce reste supérieure au contre, qui masquerait la nature réellement régulière de la main. Le partenaire développera la suite comme après une ouverture normale de 1SA."]},
-{p:"Nord",v:"Personne",h:["Q85","K943","A72","K94"],a:"1♠ - Passe - Passe - ?",q:"[Réveil] L'adversaire ouvre 1♠, deux passes suivent. Main régulière avec arrêt à Pique. Que faites-vous ?",c:"1SA",cat:"other",e:["Un arrêt à Pique associé à une distribution régulière justifie le réveil par 1SA, précisant immédiatement 11-14 H équilibrée avec arrêt dans la couleur d'ouverture adverse. Cette annonce reste la plus descriptive possible dans cette configuration. Le partenaire poursuivra le développement selon les mécanismes standards du 1SA."]},
-{p:"Sud",v:"Tous",h:["K87","QJ43","Q72","K94"],a:"1♣ - Passe - Passe - ?",q:"[Réveil] L'adversaire ouvre 1♣, deux passes suivent. Main régulière minimum avec arrêt à Trèfle. Que faites-vous ?",c:"1SA",cat:"other",e:["Même en bas de la fourchette de réveil, onze points d'honneur avec une distribution régulière et un arrêt réel dans la couleur adverse justifient le 1SA plutôt qu'un contre. Cette main illustre le minimum acceptable pour cette annonce descriptive. Le partenaire connaît immédiatement une fourchette de points étroite pour la suite du développement."]},
+{p:"Sud",v:"Tous",h:["K943","A72","Q85","K94"],a:"1♣ - Passe - Passe - ?",q:"Que faites-vous en position de réveil ?",c:"1SA",cat:"other",e:["Une distribution régulière avec un arrêt solide dans la couleur d'ouverture adverse justifie le réveil par 1SA plutôt que par contre, décrivant précisément une main de 11-14 H équilibrée. Cette annonce reste plus informative qu'un contre qui laisserait le choix de couleur au partenaire sans nécessité ici. Le partenaire pourra explorer la suite normalement, comme après une ouverture directe de 1SA."]},
+{p:"Est",v:"EO",h:["K943","A72","KQ5","Q94"],a:"1♦ - Passe - Passe - ?",q:"Que faites-vous en position de réveil ?",c:"1SA",cat:"other",e:["Un arrêt solide dans la couleur d'ouverture adverse (Roi-Dame) combiné à une distribution régulière et 14 H, en haut de la fourchette de réveil, justifie pleinement le 1SA plutôt qu'un contre moins précis. Cette annonce décrit immédiatement force et arrêt au partenaire. La main mérite cette précision plutôt qu'un contre qui resterait ambigu sur la nature exacte du jeu."]},
+{p:"Ouest",v:"Personne",h:["K943","Q85","A72","K94"],a:"1♥ - Passe - Passe - ?",q:"Que faites-vous en position de réveil ?",c:"1SA",cat:"other",e:["L'arrêt à Cœur combiné à une distribution parfaitement régulière justifie le réveil par 1SA, message précis de 11-14 H équilibrée avec arrêt dans la couleur adverse. Cette annonce reste supérieure au contre, qui masquerait la nature réellement régulière de la main. Le partenaire développera la suite comme après une ouverture normale de 1SA."]},
+{p:"Nord",v:"Personne",h:["Q85","K943","A72","K94"],a:"1♠ - Passe - Passe - ?",q:"Que faites-vous en position de réveil ?",c:"1SA",cat:"other",e:["Un arrêt à Pique associé à une distribution régulière justifie le réveil par 1SA, précisant immédiatement 11-14 H équilibrée avec arrêt dans la couleur d'ouverture adverse. Cette annonce reste la plus descriptive possible dans cette configuration. Le partenaire poursuivra le développement selon les mécanismes standards du 1SA."]},
+{p:"Sud",v:"Tous",h:["K87","QJ43","Q72","K94"],a:"1♣ - Passe - Passe - ?",q:"Que faites-vous en position de réveil ?",c:"1SA",cat:"other",e:["Même en bas de la fourchette de réveil, onze points d'honneur avec une distribution régulière et un arrêt réel dans la couleur adverse justifient le 1SA plutôt qu'un contre. Cette main illustre le minimum acceptable pour cette annonce descriptive. Le partenaire connaît immédiatement une fourchette de points étroite pour la suite du développement."]},
 
 // ===== REDEMANDE DU RÉVEILLEUR (10) — après contre de réveil : préférence/passe/manche selon fit et force ; après 1SA de réveil : mêmes mécanismes qu'après 1SA direct (Stayman, invite, signoff) =====
-{p:"Nord",v:"Personne",h:["72","AKQJ8","K943","72"],a:"1♠ - Passe - Passe - Contre(vous) - Passe - 2♥(partenaire) - ?",q:"[Redemande réveilleur] Le partenaire répond 2♥ à votre contre de réveil. Vous avez un fit de cinq cartes et un jeu maximum. Que faites-vous ?",c:"4♥",cat:"other",e:["Un fit de cinq cartes à Cœur combiné à une force largement supérieure au minimum de réveil (13 H avec une couleur maîtresse) autorise le saut direct à la manche. Cette main dépasse nettement le simple contre minimum, justifiant cette accélération. Le partenaire, ayant répondu dans sa meilleure couleur, découvrira une main bien plus riche que prévu."]},
-{p:"Sud",v:"NS",h:["K943","A872","94","Q72"],a:"1♣ - Passe - Passe - Contre(vous) - Passe - 1♥(partenaire) - ?",q:"[Redemande réveilleur] Le partenaire répond 1♥ à votre contre de réveil. Vous êtes minimum. Que faites-vous ?",c:"Passe",cat:"other",e:["Avec neuf points d'honneur, strictement le minimum de la fourchette de réveil, le passe reste la réaction naturelle à la réponse du partenaire. Le contre de réveil ne garantissant aucune force particulière au-delà du minimum, il y a peu d'intérêt à relancer ici. Le contrat se joue à 1♥, choix du partenaire respecté."]},
-{p:"Est",v:"Tous",h:["QJ854","K72","7","AK94"],a:"1♦ - Passe - Passe - Contre(vous) - Passe - 2♣(partenaire) - ?",q:"[Redemande réveilleur] Le partenaire répond 2♣ à votre contre. Vous avez votre propre couleur de cinq cartes à Pique et une main correcte. Que faites-vous ?",c:"2♠",cat:"other",e:["Plutôt que d'accepter la couleur du partenaire, la préférence pour sa propre couleur de cinq cartes reste justifiée lorsque celle-ci est de bonne qualité et que la main dépasse le simple minimum. Cette main avec treize points d'honneur et un beau Pique correspond exactement à ce profil. Le partenaire acceptera généralement cette préférence naturelle."]},
-{p:"Ouest",v:"Personne",h:["AQ85","K943","72","K72"],a:"1♣ - Passe - Passe - Contre(vous) - Passe - 3♥(partenaire, saut constructif) - ?",q:"[Redemande réveilleur] Le partenaire saute à 3♥, montrant un fit constructif. Vous avez un fit confirmé et des valeurs. Que faites-vous ?",c:"4♥",cat:"other",e:["Le saut du partenaire à 3♥ après un contre de réveil montre un fit constructif avec des valeurs invitantes, dépassant la simple réponse minimum. Avec un fit confirmé et des valeurs supplémentaires, la manche directe paraît la meilleure action sans exploration complémentaire. Cette main de douze points d'honneur avec support à Cœur justifie pleinement cette conclusion."]},
-{p:"Nord",v:"NS",h:["Q943","K872","A72","94"],a:"1♠ - Passe - Passe - Contre(vous) - Passe - 2♦(partenaire) - ?",q:"[Redemande réveilleur] Le partenaire répond 2♦ à votre contre de réveil. Vous êtes minimum. Que faites-vous ?",c:"Passe",cat:"other",e:["Neuf points d'honneur, minimum strict de la fourchette de réveil, ne laissent rien à ajouter après la réponse du partenaire. Le passe reste la conclusion naturelle, le contre n'ayant jamais promis plus que ce minimum. Le contrat se joue à 2♦, choix respecté du partenaire."]},
+{p:"Nord",v:"Personne",h:["72","AKQJ8","K943","72"],a:"1♠ - Passe - Passe - Contre(vous) - Passe - 2♥(partenaire) - ?",q:"Que faites-vous ?",c:"4♥",cat:"other",e:["Un fit de cinq cartes à Cœur combiné à une force largement supérieure au minimum de réveil (13 H avec une couleur maîtresse) autorise le saut direct à la manche. Cette main dépasse nettement le simple contre minimum, justifiant cette accélération. Le partenaire, ayant répondu dans sa meilleure couleur, découvrira une main bien plus riche que prévu."]},
+{p:"Sud",v:"NS",h:["K943","A872","94","Q72"],a:"1♣ - Passe - Passe - Contre(vous) - Passe - 1♥(partenaire) - ?",q:"Que faites-vous ?",c:"Passe",cat:"other",e:["Avec neuf points d'honneur, strictement le minimum de la fourchette de réveil, le passe reste la réaction naturelle à la réponse du partenaire. Le contre de réveil ne garantissant aucune force particulière au-delà du minimum, il y a peu d'intérêt à relancer ici. Le contrat se joue à 1♥, choix du partenaire respecté."]},
+{p:"Est",v:"Tous",h:["QJ854","K72","7","AK94"],a:"1♦ - Passe - Passe - Contre(vous) - Passe - 2♣(partenaire) - ?",q:"Que faites-vous ?",c:"2♠",cat:"other",e:["Plutôt que d'accepter la couleur du partenaire, la préférence pour sa propre couleur de cinq cartes reste justifiée lorsque celle-ci est de bonne qualité et que la main dépasse le simple minimum. Cette main avec treize points d'honneur et un beau Pique correspond exactement à ce profil. Le partenaire acceptera généralement cette préférence naturelle."]},
+{p:"Ouest",v:"Personne",h:["AQ85","K943","72","K72"],a:"1♣ - Passe - Passe - Contre(vous) - Passe - 3♥(partenaire, saut constructif) - ?",q:"Que faites-vous ?",c:"4♥",cat:"other",e:["Le saut du partenaire à 3♥ après un contre de réveil montre un fit constructif avec des valeurs invitantes, dépassant la simple réponse minimum. Avec un fit confirmé et des valeurs supplémentaires, la manche directe paraît la meilleure action sans exploration complémentaire. Cette main de douze points d'honneur avec support à Cœur justifie pleinement cette conclusion."]},
+{p:"Nord",v:"NS",h:["Q943","K872","A72","94"],a:"1♠ - Passe - Passe - Contre(vous) - Passe - 2♦(partenaire) - ?",q:"Que faites-vous ?",c:"Passe",cat:"other",e:["Neuf points d'honneur, minimum strict de la fourchette de réveil, ne laissent rien à ajouter après la réponse du partenaire. Le passe reste la conclusion naturelle, le contre n'ayant jamais promis plus que ce minimum. Le contrat se joue à 2♦, choix respecté du partenaire."]},
 
-{p:"Sud",v:"Tous",h:["K943","A72","Q85","K94"],a:"1♣ - Passe - Passe - 1SA(vous) - Passe - 2♣(partenaire, Stayman) - ?",q:"[Redemande réveilleur] Le partenaire demande Stayman après votre 1SA de réveil. Vous avez une majeure de quatre cartes. Que répondez-vous ?",c:"2♠",cat:"other",e:["Le 1SA de réveil se développe exactement comme un 1SA d'ouverture classique : le Stayman fonctionne selon les mêmes mécanismes habituels. Cette main possède une majeure de quatre cartes à Pique, annoncée directement en réponse. Le partenaire pourra fixer le meilleur contrat selon cette information."]},
-{p:"Est",v:"EO",h:["K93","A72","KQ5","Q943"],a:"1♦ - Passe - Passe - 1SA(vous) - Passe - 2♣(partenaire, Stayman) - ?",q:"[Redemande réveilleur] Le partenaire demande Stayman. Vous n'avez pas de majeure de quatre cartes. Que répondez-vous ?",c:"2♦",cat:"other",e:["Sans majeure de quatre cartes, la réponse négative systématique 2♦ s'impose, identique au développement après un 1SA d'ouverture direct. Le fait que ce 1SA provienne d'un réveil ne change rien à la mécanique conventionnelle du Stayman. Le partenaire réorientera son développement en conséquence."]},
-{p:"Ouest",v:"Personne",h:["K943","KQ5","A72","Q94"],a:"1♥ - Passe - Passe - 1SA(vous) - Passe - 2SA(partenaire, invite) - ?",q:"[Redemande réveilleur] Le partenaire invite par 2SA après votre 1SA de réveil. Vous avez un jeu maximum. Que faites-vous ?",c:"3SA",cat:"other",e:["Un jeu maximum dans la fourchette du 1SA de réveil (14 H) face à une invitation directe justifie l'acceptation vers la manche. Cette décision reste habituelle dès que le maximum de fourchette est confirmé, exactement comme après un 1SA d'ouverture classique. Le partenaire découvrira une main en haut de la fourchette annoncée."]},
-{p:"Nord",v:"Personne",h:["Q87","K943","A72","K94"],a:"1♠ - Passe - Passe - 1SA(vous) - Passe - 2SA(partenaire, invite) - ?",q:"[Redemande réveilleur] Le partenaire invite par 2SA. Vous êtes minimum. Que faites-vous ?",c:"Passe",cat:"other",e:["Un jeu minimum dans la fourchette du 1SA de réveil (12 H) face à une invitation ne justifie pas d'accepter la manche. Le passe reste la décision appropriée, exactement comme après un 1SA d'ouverture classique en bas de fourchette. Le contrat reste à 2SA, résultat confortable compte tenu des deux mains modestes."]},
-{p:"Sud",v:"Tous",h:["A943","K72","Q85","K94"],a:"1♣ - Passe - Passe - 1SA(vous) - Passe - 2♥(partenaire, signoff naturel) - ?",q:"[Redemande réveilleur] Le partenaire signe off à 2♥ après votre 1SA de réveil. Que faites-vous ?",c:"Passe",cat:"other",e:["Un changement de couleur non forcing au palier de 2 après un 1SA de réveil constitue un signoff naturel, montrant une main faible avec une longue couleur personnelle. Le passe reste la seule réponse cohérente, l'ouvreur n'ayant aucune raison de forcer davantage l'enchère. Le contrat se joue à 2♥, choix du partenaire respecté."]},
+{p:"Sud",v:"Tous",h:["K943","A72","Q85","K94"],a:"1♣ - Passe - Passe - 1SA(vous) - Passe - 2♣(partenaire, Stayman) - ?",q:"Que répondez-vous ?",c:"2♠",cat:"other",e:["Le 1SA de réveil se développe exactement comme un 1SA d'ouverture classique : le Stayman fonctionne selon les mêmes mécanismes habituels. Cette main possède une majeure de quatre cartes à Pique, annoncée directement en réponse. Le partenaire pourra fixer le meilleur contrat selon cette information."]},
+{p:"Est",v:"EO",h:["K93","A72","KQ5","Q943"],a:"1♦ - Passe - Passe - 1SA(vous) - Passe - 2♣(partenaire, Stayman) - ?",q:"Que répondez-vous ?",c:"2♦",cat:"other",e:["Sans majeure de quatre cartes, la réponse négative systématique 2♦ s'impose, identique au développement après un 1SA d'ouverture direct. Le fait que ce 1SA provienne d'un réveil ne change rien à la mécanique conventionnelle du Stayman. Le partenaire réorientera son développement en conséquence."]},
+{p:"Ouest",v:"Personne",h:["K943","KQ5","A72","Q94"],a:"1♥ - Passe - Passe - 1SA(vous) - Passe - 2SA(partenaire, invite) - ?",q:"Que faites-vous ?",c:"3SA",cat:"other",e:["Un jeu maximum dans la fourchette du 1SA de réveil (14 H) face à une invitation directe justifie l'acceptation vers la manche. Cette décision reste habituelle dès que le maximum de fourchette est confirmé, exactement comme après un 1SA d'ouverture classique. Le partenaire découvrira une main en haut de la fourchette annoncée."]},
+{p:"Nord",v:"Personne",h:["Q87","K943","A72","K94"],a:"1♠ - Passe - Passe - 1SA(vous) - Passe - 2SA(partenaire, invite) - ?",q:"Que faites-vous ?",c:"Passe",cat:"other",e:["Un jeu minimum dans la fourchette du 1SA de réveil (12 H) face à une invitation ne justifie pas d'accepter la manche. Le passe reste la décision appropriée, exactement comme après un 1SA d'ouverture classique en bas de fourchette. Le contrat reste à 2SA, résultat confortable compte tenu des deux mains modestes."]},
+{p:"Sud",v:"Tous",h:["A943","K72","Q85","K94"],a:"1♣ - Passe - Passe - 1SA(vous) - Passe - 2♥(partenaire, signoff naturel) - ?",q:"Que faites-vous ?",c:"Passe",cat:"other",e:["Un changement de couleur non forcing au palier de 2 après un 1SA de réveil constitue un signoff naturel, montrant une main faible avec une longue couleur personnelle. Le passe reste la seule réponse cohérente, l'ouvreur n'ayant aucune raison de forcer davantage l'enchère. Le contrat se joue à 2♥, choix du partenaire respecté."]},
 
 // ===== UNUSUAL 2SA (UNT) SUR OUVERTURE ADVERSE (5) — 2SA direct = bicolore 5-5+ mineures, force variable =====
-{p:"Sud",v:"Personne",h:["3","72","AKQ85","QJ943"],a:"Adversaire 1♥ - ?",q:"[Unusual 2SA] Vous avez cinq cartes ou plus dans chaque mineure. Que faites-vous ?",c:"2SA",cat:"comp",e:["Le 2SA direct sur ouverture adverse (Unusual 2NT) montre un bicolore mineur de cinq cartes ou plus dans chaque couleur, ici Carreau et Trèfle. Cette annonce artificielle décrit immédiatement les deux couleurs au partenaire, contrairement à une intervention naturelle qui n'en montrerait qu'une seule. La force reste variable selon les accords de paire, de préemptive à constructive."]},
-{p:"Nord",v:"NS",h:["72","3","KQJ85","AQ943"],a:"Adversaire 1♠ - ?",q:"[Unusual 2SA] Vous avez cinq cartes ou plus dans chaque mineure. Que faites-vous ?",c:"2SA",cat:"comp",e:["Même mécanisme après une ouverture adverse à Pique : le 2SA direct annonce le bicolore mineur Carreau-Trèfle, tous deux à cinq cartes ou plus. Cette convention reste plus précise qu'une intervention naturelle limitée à une seule couleur. Le partenaire choisira sa meilleure mineure ou soutiendra directement."]},
-{p:"Est",v:"Tous",h:["72","94","AKQ85","QJ94"],a:"Adversaire 1♥ - ?",q:"[Unusual 2SA] Vous avez cinq cartes à Carreau mais seulement quatre à Trèfle. L'Unusual 2SA est-il approprié ?",c:"2♦",cat:"comp",e:["L'Unusual 2SA exige un véritable bicolore 5-5 ou plus dans les deux mineures ; ici Trèfle ne compte que quatre cartes, condition non remplie. L'intervention naturelle à 2♦ décrit fidèlement la seule couleur réellement longue. Forcer l'Unusual 2SA sur cette main enverrait un message trompeur au partenaire sur la répartition exacte."]},
-{p:"Ouest",v:"Personne",h:["943","K72","72","K9853"],a:"Adversaire 1♥ - Partenaire 2SA(UNT) - ?",q:"[Unusual 2SA] Le partenaire annonce l'Unusual 2SA. Vous préférez nettement une des deux mineures. Que faites-vous ?",c:"3♣",cat:"comp",e:["Face à l'Unusual 2SA, le répondant choisit la mineure la mieux adaptée à sa main plutôt que de rester passif. Cette main possède cinq cartes à Trèfle contre seulement deux à Carreau, préférence nette pour Trèfle. Le contrat se jouera dans la couleur choisie, généralement au plus bas palier compétitif compte tenu de la force limitée."]},
-{p:"Nord",v:"Tous",h:["4","K72","AKQ85","K984"],a:"Adversaire 1♥ - Partenaire 2SA(UNT) - ?",q:"[Unusual 2SA] Le partenaire annonce l'Unusual 2SA. Vous avez un fit fort et des valeurs. Que faites-vous ?",c:"5♦",cat:"comp",e:["Avec un fit exceptionnel dans l'une des deux mineures annoncées et des valeurs de manche, une relance directe et agressive reste justifiée par la longueur combinée probable, conformément à la loi des levées totales. Cette main possède cinq cartes à Carreau et des honneurs solides, justifiant ce saut. Le partenaire découvrira un jeu bien plus riche que le minimum attendu pour cette convention."]},
+{p:"Sud",v:"Personne",h:["3","72","AKQ85","QJ943"],a:"Adversaire 1♥ - ?",q:"Vous avez cinq cartes ou plus dans chaque mineure. Que faites-vous ?",c:"2SA",cat:"comp",e:["Le 2SA direct sur ouverture adverse (Unusual 2NT) montre un bicolore mineur de cinq cartes ou plus dans chaque couleur, ici Carreau et Trèfle. Cette annonce artificielle décrit immédiatement les deux couleurs au partenaire, contrairement à une intervention naturelle qui n'en montrerait qu'une seule. La force reste variable selon les accords de paire, de préemptive à constructive."]},
+{p:"Nord",v:"NS",h:["72","3","KQJ85","AQ943"],a:"Adversaire 1♠ - ?",q:"Vous avez cinq cartes ou plus dans chaque mineure. Que faites-vous ?",c:"2SA",cat:"comp",e:["Même mécanisme après une ouverture adverse à Pique : le 2SA direct annonce le bicolore mineur Carreau-Trèfle, tous deux à cinq cartes ou plus. Cette convention reste plus précise qu'une intervention naturelle limitée à une seule couleur. Le partenaire choisira sa meilleure mineure ou soutiendra directement."]},
+{p:"Est",v:"Tous",h:["72","94","AKQ85","QJ94"],a:"Adversaire 1♥ - ?",q:"Vous avez cinq cartes à Carreau mais seulement quatre à Trèfle. Que faites-vous ?",c:"2♦",cat:"comp",e:["L'Unusual 2SA exige un véritable bicolore 5-5 ou plus dans les deux mineures ; ici Trèfle ne compte que quatre cartes, condition non remplie. L'intervention naturelle à 2♦ décrit fidèlement la seule couleur réellement longue. Forcer l'Unusual 2SA sur cette main enverrait un message trompeur au partenaire sur la répartition exacte."]},
+{p:"Ouest",v:"Personne",h:["943","K72","72","K9853"],a:"Adversaire 1♥ - Partenaire 2SA(UNT) - ?",q:"Le partenaire annonce l'Unusual 2SA. Vous préférez nettement une des deux mineures. Que faites-vous ?",c:"3♣",cat:"comp",e:["Face à l'Unusual 2SA, le répondant choisit la mineure la mieux adaptée à sa main plutôt que de rester passif. Cette main possède cinq cartes à Trèfle contre seulement deux à Carreau, préférence nette pour Trèfle. Le contrat se jouera dans la couleur choisie, généralement au plus bas palier compétitif compte tenu de la force limitée."]},
+{p:"Nord",v:"Tous",h:["4","K72","AKQ85","K984"],a:"Adversaire 1♥ - Partenaire 2SA(UNT) - ?",q:"Le partenaire annonce l'Unusual 2SA. Vous avez un fit fort et des valeurs. Que faites-vous ?",c:"5♦",cat:"comp",e:["Avec un fit exceptionnel dans l'une des deux mineures annoncées et des valeurs de manche, une relance directe et agressive reste justifiée par la longueur combinée probable, conformément à la loi des levées totales. Cette main possède cinq cartes à Carreau et des honneurs solides, justifiant ce saut. Le partenaire découvrira un jeu bien plus riche que le minimum attendu pour cette convention."]},
 
 // ===== CUE-BID MICHAELS (5) — cue-bid de la couleur adverse = bicolore 5-5+ ; sur 1♣/1♦ = deux majeures ; sur 1♥/1♠ = l'autre majeure + mineure non précisée ; 8-11H non-vul, 12+H vul ; 17+H : contre puis correction =====
-{p:"Sud",v:"Personne",h:["QJ854","AK943","72","9"],a:"Adversaire 1♣ - ?",q:"[Michaels] Vous avez cinq cœurs et cinq piques. Que faites-vous ?",c:"2♣",cat:"comp",e:["Le cue-bid de la couleur d'ouverture adverse (Michaels) montre sur une mineure un bicolore des deux majeures, ici cinq piques et cinq cœurs. Cette main de dix points d'honneur correspond à la fourchette non-vulnérable (8-11 H). Le partenaire choisira sa meilleure majeure sans que l'adversaire ne sache laquelle privilégier en défense."]},
-{p:"Nord",v:"Tous",h:["KQ852","AQJ94","3","84"],a:"Adversaire 1♦ - ?",q:"[Michaels] Vous avez cinq piques et cinq cœurs, tous vulnérables. Que faites-vous ?",c:"2♦",cat:"comp",e:["Tous vulnérables, la fourchette Michaels s'élève à 12 H et plus, plus prudente que le seuil non-vulnérable. Cette main de douze points d'honneur avec les deux majeures à cinq cartes correspond exactement à ce profil renforcé. Le cue-bid reste plus précis qu'une intervention simple limitée à une seule couleur."]},
-{p:"Est",v:"EO",h:["QJ854","3","AKQ94","72"],a:"Adversaire 1♥ - ?",q:"[Michaels] Vous avez cinq piques et cinq carreaux. Que faites-vous ?",c:"2♥",cat:"comp",e:["Sur une ouverture adverse de majeure, le cue-bid Michaels montre l'autre majeure (ici Pique) accompagnée d'une mineure de cinq cartes non précisée à ce stade, ici Carreau. Cette main de douze points d'honneur correspond à ce profil bicolore. Le partenaire découvrira la mineure exacte lors du développement ultérieur de l'enchère."]},
-{p:"Ouest",v:"Personne",h:["3","AKQ85","72","Q9843"],a:"Adversaire 1♠ - ?",q:"[Michaels] Vous avez cinq cœurs et cinq trèfles. Que faites-vous ?",c:"2♠",cat:"comp",e:["Sur une ouverture adverse à Pique, le cue-bid Michaels montre Cœur accompagné d'une mineure de cinq cartes non précisée, ici Trèfle. Cette main de onze points d'honneur reste dans la fourchette non-vulnérable habituelle. Le partenaire pourra explorer la mineure exacte selon le développement de l'enchère."]},
-{p:"Sud",v:"Tous",h:["AKQ85","AKQ94","3","72"],a:"Adversaire 1♣ - ?",q:"[Michaels] Vous avez les deux majeures à cinq cartes avec une main exceptionnellement forte. Le cue-bid Michaels direct est-il approprié ?",c:"Contre",cat:"comp",e:["Avec dix-huit points d'honneur, bien au-delà du seuil maximal habituel du Michaels, le contre reste préférable selon les accords SEF 2024 : il permet de corriger ensuite vers la majeure choisie sans plafonner prématurément la force annoncée. Un cue-bid direct sous-décrirait gravement cette main exceptionnelle. Le partenaire répondra normalement au contre, révélant sa meilleure couleur avant que l'ouvreur ne précise sa force réelle."]}
+{p:"Sud",v:"Personne",h:["QJ854","AK943","72","9"],a:"Adversaire 1♣ - ?",q:"Vous avez cinq cœurs et cinq piques. Que faites-vous ?",c:"2♣",cat:"comp",e:["Le cue-bid de la couleur d'ouverture adverse (Michaels) montre sur une mineure un bicolore des deux majeures, ici cinq piques et cinq cœurs. Cette main de dix points d'honneur correspond à la fourchette non-vulnérable (8-11 H). Le partenaire choisira sa meilleure majeure sans que l'adversaire ne sache laquelle privilégier en défense."]},
+{p:"Nord",v:"Tous",h:["KQ852","AQJ94","3","84"],a:"Adversaire 1♦ - ?",q:"Vous avez cinq piques et cinq cœurs, tous vulnérables. Que faites-vous ?",c:"2♦",cat:"comp",e:["Tous vulnérables, la fourchette Michaels s'élève à 12 H et plus, plus prudente que le seuil non-vulnérable. Cette main de douze points d'honneur avec les deux majeures à cinq cartes correspond exactement à ce profil renforcé. Le cue-bid reste plus précis qu'une intervention simple limitée à une seule couleur."]},
+{p:"Est",v:"EO",h:["QJ854","3","AKQ94","72"],a:"Adversaire 1♥ - ?",q:"Vous avez cinq piques et cinq carreaux. Que faites-vous ?",c:"2♥",cat:"comp",e:["Sur une ouverture adverse de majeure, le cue-bid Michaels montre l'autre majeure (ici Pique) accompagnée d'une mineure de cinq cartes non précisée à ce stade, ici Carreau. Cette main de douze points d'honneur correspond à ce profil bicolore. Le partenaire découvrira la mineure exacte lors du développement ultérieur de l'enchère."]},
+{p:"Ouest",v:"Personne",h:["3","AKQ85","72","Q9843"],a:"Adversaire 1♠ - ?",q:"Vous avez cinq cœurs et cinq trèfles. Que faites-vous ?",c:"2♠",cat:"comp",e:["Sur une ouverture adverse à Pique, le cue-bid Michaels montre Cœur accompagné d'une mineure de cinq cartes non précisée, ici Trèfle. Cette main de onze points d'honneur reste dans la fourchette non-vulnérable habituelle. Le partenaire pourra explorer la mineure exacte selon le développement de l'enchère."]},
+{p:"Sud",v:"Tous",h:["AKQ85","AKQ94","3","72"],a:"Adversaire 1♣ - ?",q:"Vous avez les deux majeures à cinq cartes avec une main exceptionnellement forte. Que faites-vous ?",c:"Contre",cat:"comp",e:["Avec dix-huit points d'honneur, bien au-delà du seuil maximal habituel du Michaels, le contre reste préférable selon les accords SEF 2024 : il permet de corriger ensuite vers la majeure choisie sans plafonner prématurément la force annoncée. Un cue-bid direct sous-décrirait gravement cette main exceptionnelle. Le partenaire répondra normalement au contre, révélant sa meilleure couleur avant que l'ouvreur ne précise sa force réelle."]}
 ];
 
 const numberedBank = bank.map((q,i) => ({...q, num: i+1}));
@@ -630,7 +681,7 @@ const themeDefs = [
   {name:"Réponses à l'ouverture de 2♦ par As", cat:"other", count:7, classic:false},
   {name:"Lebensohl", cat:"other", count:5, classic:false},
   {name:"Check-back Stayman / Nouvelle mineure forcing", cat:"other", count:5, classic:false},
-  {name:"Rubensohl", cat:"other", count:5, classic:false},
+  {name:"Rubensohl", cat:"other", count:6, classic:false},
   {name:"⚠️ ANNEXE (hors SEF) — 2♦ Multi", cat:"other", count:10, classic:false},
   {name:"Redemande de l'ouvreur", cat:"other", count:20, classic:true},
   {name:"Réveil et réponse en 4e position", cat:"other", count:20, classic:true},
@@ -644,7 +695,7 @@ let roundNum = 1;
 let currentMode = 'random';
 let currentThemeStart = 0;
 let currentThemeCount = numberedBank.length;
-let currentThemeName = 'Test aléatoire';
+let currentThemeName = 'Jouer en situation';
 let guidedStats = {};
 let guidedAnswered = 0;
 let currentQuestionTheme = '';
@@ -652,6 +703,7 @@ let playerName = '';
 let guidedHistory = [];
 let sessionAnswered = 0;
 let sessionCorrect = 0;
+let handNotation = 'fr';
 
 function shuffle(arr) {
   const a = [...arr];
@@ -754,14 +806,77 @@ function startGuidedMode() {
   showQuiz();
 }
 
+const STORE_PREFIX = 'sef363:';
+
+// Toutes les méthodes de console ne sont pas garanties selon l'environnement
+// (console.debug manque dans certains bacs à sable). Un échec de journalisation
+// ne doit jamais interrompre une écriture ni empêcher le repli local.
+let storeRemoteFailed = false;
+
+// Un seul message par session : la couche distante échoue sur chaque clé,
+// y compris quand la clé est simplement absente au premier lancement.
+function noteRemoteFailure() {
+  if (storeRemoteFailed) return;
+  storeRemoteFailed = true;
+  logStore('Stockage distant indisponible — bascule sur localStorage pour cette session.');
+}
+
+function logStore(msg, detail) {
+  try {
+    if (typeof console === 'undefined') return;
+    const fn = console.debug || console.log || console.warn || console.error;
+    if (typeof fn === 'function') fn.call(console, msg, detail);
+  } catch (e) { /* silence volontaire */ }
+}
+
+// window.storage n'existe que dans les artifacts Claude, et peut y échouer
+// (clé absente, erreur serveur). Dans tous les cas on retombe sur localStorage,
+// qui reste la seule couche disponible en HTML statique.
+function localGet(key) {
+  try {
+    const v = localStorage.getItem(STORE_PREFIX + key);
+    return v === null ? null : { key: key, value: v };
+  } catch (e) { logStore('localStorage indisponible en lecture :', e); return null; }
+}
+
+function localSet(key, value) {
+  try {
+    localStorage.setItem(STORE_PREFIX + key, value);
+    return { key: key, value: value };
+  } catch (e) { logStore('localStorage indisponible en écriture :', e); return null; }
+}
+
+const store = {
+  async get(key) {
+    if (window.storage) {
+      try {
+        const res = await window.storage.get(key);
+        if (res) return res;
+      } catch (e) { noteRemoteFailure(); }
+    }
+    return localGet(key);
+  },
+  async set(key, value) {
+    let res = null;
+    if (window.storage) {
+      try { res = await window.storage.set(key, value); }
+      catch (e) { noteRemoteFailure(); }
+    }
+    // on double systématiquement l'écriture en local : si la couche distante
+    // tombe en cours de session, rien n'est perdu au rechargement.
+    const loc = localSet(key, value);
+    return res || loc;
+  }
+};
+
 async function savePlayerName() {
   const input = document.getElementById('playerNameInput');
   playerName = input ? input.value.trim() : '';
-  try { await window.storage.set('player-name', playerName); } catch (e) {}
+  try { await store.set('player-name', playerName); } catch (e) { logStore('Stockage indisponible :', e); }
 }
 
 async function saveGuidedStats() {
-  try { await window.storage.set('guided-stats', JSON.stringify({stats: guidedStats, answered: guidedAnswered})); } catch (e) {}
+  try { await store.set('guided-stats', JSON.stringify({stats: guidedStats, answered: guidedAnswered})); } catch (e) { logStore('Stockage indisponible :', e); }
 }
 
 async function saveSessionToHistory() {
@@ -774,8 +889,53 @@ async function saveSessionToHistory() {
   };
   guidedHistory.unshift(entry);
   guidedHistory = guidedHistory.slice(0, 20);
-  try { await window.storage.set('guided-history', JSON.stringify(guidedHistory)); } catch (e) {}
+  try { await store.set('guided-history', JSON.stringify(guidedHistory)); } catch (e) { logStore('Stockage indisponible :', e); }
   renderHistory();
+}
+
+function coverSeen() {
+  try { return localStorage.getItem(STORE_PREFIX + 'cover-seen') === '1'; }
+  catch (e) { return false; }
+}
+
+function showCover() {
+  ['menuCard', 'quizCard', 'themeListCard', 'finalCard'].forEach(id => {
+    const n = document.getElementById(id);
+    if (n) n.classList.add('hidden');
+  });
+  const cover = document.getElementById('coverCard');
+  if (cover) cover.classList.remove('hidden');
+}
+
+async function startFromCover() {
+  document.getElementById('coverCard').classList.add('hidden');
+  document.getElementById('menuCard').classList.remove('hidden');
+  try { await store.set('cover-seen', '1'); } catch (e) { logStore('Stockage indisponible :', e); }
+}
+
+// Lecture synchrone : évite que le menu clignote avant la page de garde.
+function initCover() {
+  if (coverSeen()) {
+    document.getElementById('coverCard').classList.add('hidden');
+    document.getElementById('menuCard').classList.remove('hidden');
+  }
+}
+
+function renderTotalScore() {
+  const box = document.getElementById('totalScore');
+  if (!box) return;
+  let attempts = 0, correct = 0;
+  Object.keys(guidedStats).forEach(k => {
+    attempts += guidedStats[k].attempts || 0;
+    correct  += guidedStats[k].correct  || 0;
+  });
+  if (attempts === 0) {
+    box.innerHTML = '<span style="color:var(--muted);">Score cumulé : aucune réponse enregistrée.</span>';
+    return;
+  }
+  const pct = Math.round(correct / attempts * 100);
+  box.innerHTML = '<strong style="color:var(--accent-dark);">Score cumulé : ' + correct + '/' + attempts + '</strong>'
+                + ' <span style="color:var(--muted);">(' + pct + ' % — révision guidée)</span>';
 }
 
 function renderHistory() {
@@ -790,24 +950,30 @@ function renderHistory() {
 
 async function loadPlayerData() {
   try {
-    const nameRes = await window.storage.get('player-name');
+    const nameRes = await store.get('player-name');
     if (nameRes) playerName = nameRes.value;
-  } catch (e) {}
+  } catch (e) { logStore('Stockage indisponible :', e); }
   try {
-    const statsRes = await window.storage.get('guided-stats');
+    const statsRes = await store.get('guided-stats');
     if (statsRes) {
       const parsed = JSON.parse(statsRes.value);
       guidedStats = parsed.stats || {};
       guidedAnswered = parsed.answered || 0;
     }
-  } catch (e) {}
+  } catch (e) { logStore('Stockage indisponible :', e); }
   try {
-    const histRes = await window.storage.get('guided-history');
+    const notaRes = await store.get('hand-notation');
+    if (notaRes && (notaRes.value === 'fr' || notaRes.value === 'en')) handNotation = notaRes.value;
+  } catch (e) { logStore('Stockage indisponible :', e); }
+  try {
+    const histRes = await store.get('guided-history');
     if (histRes) guidedHistory = JSON.parse(histRes.value);
-  } catch (e) {}
+  } catch (e) { logStore('Stockage indisponible :', e); }
   const input = document.getElementById('playerNameInput');
   if (input) input.value = playerName;
+  updateNotationBtn();
   renderHistory();
+  renderTotalScore();
 }
 
 function recordAnswer(correct) {
@@ -837,7 +1003,7 @@ function startRandomMode() {
   currentMode = 'random';
   currentThemeStart = 0;
   currentThemeCount = numberedBank.length;
-  currentThemeName = 'Test aléatoire';
+  currentThemeName = 'Jouer en situation';
   roundNum = 1;
   pool = [];
   drawFive();
@@ -880,12 +1046,38 @@ function backToMenu() {
   document.getElementById('progressRow').classList.add('hidden');
   document.getElementById('metaRow').classList.add('hidden');
   document.getElementById('menuCard').classList.remove('hidden');
+  renderTotalScore();
+}
+
+// Les mains sont saisies indifféremment en notation anglaise (A K Q J T)
+// ou française (A R D V 10) ; tout est ramené à la forme interne A K Q J T.
+const CARD_TO_FR = {K:'R', Q:'D', J:'V'};
+const CARD_TO_EN = {R:'K', D:'Q', V:'J'};
+
+function normalizeSuit(str) {
+  let out = '';
+  for (const ch of String(str).replace(/10/g, 'T')) {
+    out += (CARD_TO_EN[ch] !== undefined ? CARD_TO_EN[ch] : ch);
+  }
+  return out;
+}
+
+function formatSuit(str) {
+  const norm = normalizeSuit(str);
+  if (norm === '-' || norm === '') return '—';
+  let out = '';
+  for (const ch of norm) {
+    if (ch === 'T') { out += '10'; continue; }
+    out += (handNotation === 'fr' && CARD_TO_FR[ch] !== undefined) ? CARD_TO_FR[ch] : ch;
+  }
+  return out;
 }
 
 function computeHandInfo(h) {
-  const hcpMap = {A:4,K:3,R:3,Q:2,D:2,J:1,V:1};
+  const hcpMap = {A:4,K:3,Q:2,J:1};
   let total = 0;
-  const lengths = h.map(suit => {
+  const lengths = h.map(rawSuit => {
+    const suit = normalizeSuit(rawSuit);
     let len = 0;
     for (const ch of suit) {
       if (hcpMap[ch] !== undefined) total += hcpMap[ch];
@@ -894,6 +1086,27 @@ function computeHandInfo(h) {
     return len;
   });
   return { total, shape: lengths.join('-'), lengths };
+}
+
+function renderHand() {
+  const q = questions[currentIndex];
+  const box = document.getElementById('handBox');
+  if (!q || !box) return;
+  updateNotationBtn();
+  const suits = ['s','h','d','c'];
+  box.innerHTML = q.h.map((c,i)=>`<div class="suit-${suits[i]}">${formatSuit(c)}</div>`).join('');
+}
+
+function updateNotationBtn() {
+  const b = document.getElementById('notationBtn');
+  if (b) b.textContent = handNotation === 'fr' ? 'A R D V' : 'A K Q J';
+}
+
+async function toggleNotation() {
+  handNotation = (handNotation === 'fr') ? 'en' : 'fr';
+  updateNotationBtn();
+  renderHand();
+  try { await store.set('hand-notation', handNotation); } catch (e) { logStore('Stockage indisponible :', e); }
 }
 
 function loadQuestion() {
@@ -907,8 +1120,7 @@ function loadQuestion() {
   const catTag = document.getElementById('catTag');
   if (q.cat === 'comp') { catTag.textContent = "Compétitive"; catTag.className = "cat-tag cat-comp"; }
   else { catTag.textContent = "Autre"; catTag.className = "cat-tag cat-other"; }
-  const suits = ['s','h','d','c'];
-  document.getElementById('handBox').innerHTML = q.h.map((c,i)=>`<div class="suit-${suits[i]}">${c}</div>`).join('');
+  renderHand();
   document.getElementById('auctionBox').textContent = q.a;
   document.getElementById('questionText').textContent = q.q;
   document.getElementById('correctCall').textContent = q.c;
@@ -942,11 +1154,26 @@ function reveal() {
   if (currentMode === 'guided') {
     const q = questions[currentIndex];
     const userAnswer = document.getElementById('userAnswer').value.trim();
-    const normalize = s => {
-      let x = s.toLowerCase().replace(/\s+/g,'').replace(/[()]/g,'');
-      x = x.replace(/♠/g,'p').replace(/♥/g,'c').replace(/♦/g,'k').replace(/♣/g,'t');
-      if (x === 'x') x = 'contre';
-      if (x === 'xx') x = 'redouble';
+    // Le français l'emporte sur les caractères ambigus : C = Cœur (jamais Clubs),
+    // P = Pique (jamais Pass), T = Trèfle, K = Carreau. Les lettres anglaises
+    // sans équivalent français ambigu sont acceptées : S, H, D, N / NT.
+    const normalize = str => {
+      let x = String(str).toLowerCase().replace(/œ/g, 'oe')
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[\s.()\-]/g, '');
+      // mots entiers reconnus avant toute réduction à une lettre
+      if (/^(passe?|pass|parole|nobid)$/.test(x)) return 'passe';
+      if (/^(x|contre|double|dbl|ctr)$/.test(x)) return 'contre';
+      if (/^(xx|surcontre|redouble|rdbl)$/.test(x)) return 'redouble';
+      x = x.replace(/♠/g, 'p').replace(/♥/g, 'c').replace(/♦/g, 'k').replace(/♣/g, 't');
+      x = x.replace(/piques?/g, 'p').replace(/coeurs?/g, 'c')
+           .replace(/carreaux?/g, 'k').replace(/trefles?/g, 't')
+           .replace(/spades?/g, 'p').replace(/hearts?/g, 'c')
+           .replace(/diamonds?/g, 'k').replace(/clubs?/g, 't');
+      x = x.replace(/sansatout/g, 'sa').replace(/notrumps?/g, 'sa')
+           .replace(/nt$/, 'sa').replace(/n$/, 'sa');
+      // lettres anglaises sans collision française
+      x = x.replace(/(\d)s$/, '$1p').replace(/(\d)h$/, '$1c').replace(/(\d)d$/, '$1k');
       return x;
     };
     const isCorrect = userAnswer.length > 0 && normalize(userAnswer) === normalize(q.c);
@@ -994,14 +1221,15 @@ function restartRound() {
 
 function validateBank() {
   const errors = [];
-  const validSuitChars = /^[AKQJT98765432\-]+$/;
+  const validSuitChars = /^[AKQJT98765432\-]+$/;   // après normalisation
   numberedBank.forEach(q => {
     if (!Array.isArray(q.h) || q.h.length !== 4) {
       errors.push(`Donne #${q.num} : structure de main invalide (attendu 4 couleurs).`);
       return;
     }
     let total = 0;
-    q.h.forEach((suit, idx) => {
+    q.h.forEach((rawSuit, idx) => {
+      const suit = normalizeSuit(rawSuit);
       if (!validSuitChars.test(suit)) {
         errors.push(`Donne #${q.num} : caractère inattendu dans la couleur "${suit}".`);
       }
@@ -1034,5 +1262,6 @@ if (bankErrors.length > 0) {
 }
 
 buildThemeList();
+initCover();
 loadPlayerData();
 </script>
