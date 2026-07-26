@@ -2,7 +2,17 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Révise le SEF avec ClaudIA</title>
+<meta name="theme-color" content="#2e7d55">
+<meta name="description" content="363 donnes d'enchères sur le Système d'Enseignement Français 2024.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SEF 2024">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAEKUlEQVR42u3d0XHTShSAYe2Ou6AHUkDqIPSSGfKAZ9ILuA4KwD3QBTPwxAOQxJYlrXbP+f5XZq6E9On46BJMmTro/acPvyYN3/l4KnufQwFYkYAXiBUJd4FYkXAXkBUJdoVZkf5nQAFZkaZ1hVmRpnUBWZGmdYVZkaZ1hVmRUFeYFQl1hVmRUFeYFQl1hVmRUFeYFQl1dZkUqWo6K9KUrjArEmorh+KvHKazRp3SFWZFQm3lUNyVw3TW6FPahFb8l0JpeNDWDUVYO0xoWTmkrkFbNxRl7TChZeWQgE7e989fXYQGFftzW8x3Tw8uiAktAd3lqmH1ADrc3gw10OFeAqEGWgK6x+lsSgMdDjPUQEtA9zydTWmgw2GGGuhwmAW0B0NAj4AQaqDDTVSogbYeCGgPDNBqiA1qoCEDWh4goOGCGmiYoQYaZgHtwQJaQyCCGmh4gJYHDWhonB/QsAhomD14QHsAgYbDeQMNs/Yr/ReeR4Oc/QvVU4LONI2zAU8DOvtKkQV2CtD24zywQ4MGOR/qCrMXYaDdMNcIaDfKtQIaZtcsJ2iYXbvQL4XKWQjQprNraEIrJOrqJsjKIQFtOrumQEtAC2gfjQpxbU1omdAS0BLQEtACWgJaAloCWooOerTvlhjpfEf+3g4TWia0BHTij8Y/5znC+Y7+NWEmtExoEyXPxANawwKP8PBVSNqfV4/nG+WTxISWlcOUXn4+PZ1vpD0/3Df4+7uGuV9aqxsEM9BulGsEtBvm2tih7dUwm9Cj38Qtzvfu6SHFp5Z/GvlGbFtP/bWOk231OmT/2L0GzJ4o/j32pfPN/u5wmJJnHbFDp6/FS6YXWaAloAW0BLT92R4NtAS0gFa3K4C1Y14p/+h7bo8/v7356x+ff6x2rC+P79789efDvRsC9DaQ14R9CTLYQDeDvAT2XMhg26GbYp6DdCnmtc4XaJgXY10DM9RWjuYoXloJWh7LhIZ50/92y2MBLQFtOl97jJbHAloC2nTOfiygJaAloAW0BLQEtAS0BPTrRf1hnsw/pGRCC2jTzO8HaAloU810BjolBpiBDoMCZqDD4ID578o0TZO/KPtyPf9cMcj/dz6eigntU8TKAY5zAhpqmFuBPh9PxaXoGxLMl/dnExooKwfUHqYhQFs7+sQF8/Xrhgnt4bFyqA00mFcAbe0AbuR1w4TuFLWHZcWVw5TeFx/Mt0/nVyc01PsghHkZZiuHnTz+ymFKtwcJ8zrT+eKEhhrMkTBbOTpA7SFotHKY0tujhnnd6Xz1hIZ6fdQwr4951soBtV27d8yzd2iowe0Z800vhVAvQw35ttZqqwNBDXMLY4tg+j4P9YR5MWiw1QvkRSuHFUQ9Yl5tQpvW6mUY1t5PUDDvOqFNa+059JpNU7ghbnGcXdYDuCEOBRpwgLfqN2QJDtjP8bdNAAAAAElFTkSuQmCC">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAEKUlEQVR42u3d0XHTShSAYe2Ou6AHUkDqIPSSGfKAZ9ILuA4KwD3QBTPwxAOQxJYlrXbP+f5XZq6E9On46BJMmTro/acPvyYN3/l4KnufQwFYkYAXiBUJd4FYkXAXkBUJdoVZkf5nQAFZkaZ1hVmRpnUBWZGmdYVZkaZ1hVmRUFeYFQl1hVmRUFeYFQl1hVmRUFeYFQl1dZkUqWo6K9KUrjArEmorh+KvHKazRp3SFWZFQm3lUNyVw3TW6FPahFb8l0JpeNDWDUVYO0xoWTmkrkFbNxRl7TChZeWQgE7e989fXYQGFftzW8x3Tw8uiAktAd3lqmH1ADrc3gw10OFeAqEGWgK6x+lsSgMdDjPUQEtA9zydTWmgw2GGGuhwmAW0B0NAj4AQaqDDTVSogbYeCGgPDNBqiA1qoCEDWh4goOGCGmiYoQYaZgHtwQJaQyCCGmh4gJYHDWhonB/QsAhomD14QHsAgYbDeQMNs/Yr/ReeR4Oc/QvVU4LONI2zAU8DOvtKkQV2CtD24zywQ4MGOR/qCrMXYaDdMNcIaDfKtQIaZtcsJ2iYXbvQL4XKWQjQprNraEIrJOrqJsjKIQFtOrumQEtAC2gfjQpxbU1omdAS0BLQEtACWgJaAloCWooOerTvlhjpfEf+3g4TWia0BHTij8Y/5znC+Y7+NWEmtExoEyXPxANawwKP8PBVSNqfV4/nG+WTxISWlcOUXn4+PZ1vpD0/3Df4+7uGuV9aqxsEM9BulGsEtBvm2tih7dUwm9Cj38Qtzvfu6SHFp5Z/GvlGbFtP/bWOk231OmT/2L0GzJ4o/j32pfPN/u5wmJJnHbFDp6/FS6YXWaAloAW0BLT92R4NtAS0gFa3K4C1Y14p/+h7bo8/v7356x+ff6x2rC+P79789efDvRsC9DaQ14R9CTLYQDeDvAT2XMhg26GbYp6DdCnmtc4XaJgXY10DM9RWjuYoXloJWh7LhIZ50/92y2MBLQFtOl97jJbHAloC2nTOfiygJaAloAW0BLQEtAS0BPTrRf1hnsw/pGRCC2jTzO8HaAloU810BjolBpiBDoMCZqDD4ID578o0TZO/KPtyPf9cMcj/dz6eigntU8TKAY5zAhpqmFuBPh9PxaXoGxLMl/dnExooKwfUHqYhQFs7+sQF8/Xrhgnt4bFyqA00mFcAbe0AbuR1w4TuFLWHZcWVw5TeFx/Mt0/nVyc01PsghHkZZiuHnTz+ymFKtwcJ8zrT+eKEhhrMkTBbOTpA7SFotHKY0tujhnnd6Xz1hIZ6fdQwr4951soBtV27d8yzd2iowe0Z800vhVAvQw35ttZqqwNBDXMLY4tg+j4P9YR5MWiw1QvkRSuHFUQ9Yl5tQpvW6mUY1t5PUDDvOqFNa+059JpNU7ghbnGcXdYDuCEOBRpwgLfqN2QJDtjP8bdNAAAAAElFTkSuQmCC">
 <style>
   :root {
     --bg: #f4f7f3; --card: #ffffff; --accent: #2e7d55; --accent-dark: #1f5c3d;
@@ -114,6 +124,12 @@
       <p style="margin:0; font-size:0.85rem; line-height:1.55;">Seule la révision guidée offre un réservoir fixe et un tirage que tu ne contrôles pas. Les deux autres modes servent à apprendre, pas à se noter — rien n'y est enregistré.</p>
     </div>
 
+    <div id="installBox" style="margin-top:18px; padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:#f4f7f3;">
+      <div id="installText" style="font-size:0.85rem; line-height:1.55;"></div>
+      <button type="button" id="installBtn" class="btn-next" onclick="installerApp()" style="margin-top:10px;">📲 Installer sur mon téléphone</button>
+      <div id="installHelp" class="hidden" style="margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); font-size:0.82rem; line-height:1.55; color:var(--muted);"></div>
+    </div>
+
     <button class="btn-reveal" onclick="startFromCover()" style="margin-top:20px;">Commencer</button>
   </div>
 
@@ -132,7 +148,7 @@
     </div>
     <div style="margin-top:20px; padding-top:16px; border-top:1px dashed var(--line);">
       <div style="text-align:right; margin-bottom:10px;">
-        <button type="button" onclick="showCover()" style="flex:none; background:transparent; border:1px solid var(--line); color:var(--muted); font-size:0.72rem; padding:4px 12px; border-radius:20px; min-height:0; cursor:pointer;">À propos des modes</button>
+        <button type="button" onclick="showCoverAndInstall()" style="flex:none; background:transparent; border:1px solid var(--line); color:var(--muted); font-size:0.72rem; padding:4px 12px; border-radius:20px; min-height:0; cursor:pointer;">À propos des modes</button>
       </div>
       <h3 style="margin:0 0 8px 0; font-size:0.9rem; color:var(--gold);">Historique des sessions guidées</h3>
       <div id="historyList"></div>
@@ -893,10 +909,94 @@ async function saveSessionToHistory() {
   renderHistory();
 }
 
+let promptInstall = null;
+let dejaInstalle = false;
+
+function estAutonome() {
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+      || navigator.standalone === true;
+}
+
+function estIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function renderInstall() {
+  const box  = document.getElementById('installBox');
+  const txt  = document.getElementById('installText');
+  const btn  = document.getElementById('installBtn');
+  const help = document.getElementById('installHelp');
+  if (!box || !txt || !btn || !help) return;
+
+  if (dejaInstalle || estAutonome()) {       // déjà installé : on n'insiste pas
+    box.classList.add('hidden');
+    return;
+  }
+  box.classList.remove('hidden');
+  btn.classList.remove('hidden');            // le bouton est toujours proposé
+
+  txt.innerHTML = "<strong>Installer le quiz sur ton téléphone</strong><br>" +
+    "Il s'ouvre alors en plein écran, fonctionne sans connexion, et ton score " +
+    "cumulé cesse d'être effacé par le navigateur.";
+
+  btn.textContent = promptInstall ? "📲 Installer sur mon téléphone" : "📲 Comment installer";
+}
+
+function texteAide() {
+  const surSite = /^https?:$/.test(location.protocol);
+  if (!surSite) {
+    return "Cette page n'est pas servie par un site web : l'installation est impossible depuis ici. " +
+           "Publie les fichiers sur ton dépôt GitHub Pages, puis rouvre l'adresse depuis ton téléphone.";
+  }
+  if (estIOS()) {
+    return "<strong>iPhone et iPad.</strong> Dans Safari, touche le bouton Partager en bas de l'écran, " +
+           "fais défiler, puis choisis « Sur l'écran d'accueil ». Apple ne permet pas de le faire en un seul geste.";
+  }
+  return "<strong>Android et ordinateur.</strong> Ouvre le menu de ton navigateur, puis « Installer l'application » " +
+         "ou « Ajouter à l'écran d'accueil ». Si l'entrée n'apparaît pas, vérifie que la page vient bien de ton site publié.";
+}
+
+async function installerApp() {
+  const help = document.getElementById('installHelp');
+  if (promptInstall) {                       // Android : boîte de dialogue native
+    promptInstall.prompt();
+    try { await promptInstall.userChoice; } catch (e) { /* refus : sans conséquence */ }
+    promptInstall = null;
+    renderInstall();
+    return;
+  }
+  if (help) {                                // ailleurs : marche à suivre
+    help.innerHTML = texteAide();
+    help.classList.remove('hidden');
+  }
+}
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  promptInstall = e;
+  renderInstall();
+});
+
+window.addEventListener('appinstalled', () => {
+  promptInstall = null;
+  dejaInstalle = true;   // la page reste dans l'onglet : le mode autonome ne se voit pas encore
+  renderInstall();
+});
+
+// Le service worker n'existe qu'en déploiement web ; son absence est sans effet.
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
 function coverSeen() {
   try { return localStorage.getItem(STORE_PREFIX + 'cover-seen') === '1'; }
   catch (e) { return false; }
 }
+
+function showCoverAndInstall() { showCover(); renderInstall(); }
 
 function showCover() {
   ['menuCard', 'quizCard', 'themeListCard', 'finalCard'].forEach(id => {
@@ -1263,5 +1363,6 @@ if (bankErrors.length > 0) {
 
 buildThemeList();
 initCover();
+renderInstall();
 loadPlayerData();
 </script>
